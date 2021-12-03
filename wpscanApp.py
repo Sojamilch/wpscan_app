@@ -9,18 +9,17 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.completed = 0
         
+    #//////Testing how to refer to objects and maniplulate////
+        self.initiateManualScan.clicked.connect(self.increaseProgress)
 
-##def window(): 
-  ##  app = QtWidgets.QApplication(sys.argv)
-    ##widget = QtWidgets.QWidget()
-    ##textLabel = QtWidgets.QLabel(widget)
-    ##textLabel.setText("Test")
-    ##widget.setGeometry(100,100,200,50)
-    ##textLabel.move(50,20)
-    ##widget.setWindowTitle("PythonQTTEST")
-    ##widget.show()
-    ##sys.exit(app.exec_())
+    def increaseProgress(self):
+        
+        self.completed += 1
+        self.scanProgressBar.setValue(self.completed)
+
+    #/////////////////////////////////////////////////////////
 
 
 if __name__ == '__main__':
