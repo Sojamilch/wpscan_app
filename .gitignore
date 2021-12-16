@@ -138,4 +138,6 @@ dmypy.json
 cython_debug/
 
 package/db.ini
+.wpscanDomainList.db
+.wpscanDomainList
 wpscanDomainList.db
