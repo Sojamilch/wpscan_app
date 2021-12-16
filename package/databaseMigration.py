@@ -13,7 +13,7 @@ def databaseCheck():
         """
         CREATE TABLE domains (
             id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
-            domain VARCHAR(100) NOT NULL
+            domain VARCHAR(100) UNIQUE NOT NULL
         )
         """
     )

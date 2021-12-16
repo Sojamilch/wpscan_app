@@ -58,9 +58,11 @@ class Ui_MainWindow(object):
         self.addDomain = QtWidgets.QPushButton(self.domainList)
         self.addDomain.setGeometry(QtCore.QRect(290, 30, 100, 25))
         self.addDomain.setObjectName("addDomain")
+        
         self.syncList = QtWidgets.QPushButton(self.domainList)
         self.syncList.setGeometry(QtCore.QRect(290, 110, 100, 25))
         self.syncList.setObjectName("syncList")
+        
         self.tabWidget.addTab(self.domainList, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")

@@ -15,40 +15,61 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.createTableModel()
+
+        self.addDomain.clicked.connect(self.inputDomain) # Detects when button is clicked
+        self.syncList.clicked.connect(self.createTableModel) # Syncs domain list to latest version of list
         
-        def createTableModel(): # Creates data model for domain table view
-            #Checks if database exists if not generates it    
-            databaseCheck() 
+    def createTableModel(self): # Creates data model for domain table view
+        #Checks if database exists if not generates it    
+        databaseCheck() 
 
-            #create model for table
-            self.tableModel = QSqlTableModel(self)
-            self.tableModel.setTable("domains")
-            self.tableModel.setEditStrategy(QSqlTableModel.OnFieldChange)
+        #create model for table
+        self.tableModel = QSqlTableModel(self)
+        self.tableModel.setTable("domains")
+        self.tableModel.setEditStrategy(QSqlTableModel.OnFieldChange)
 
-            #Sets header names
-            self.tableModel.setHeaderData(0,  Qt.Horizontal, "ID")
-            self.tableModel.setHeaderData(1, Qt.Horizontal, "domain name")
+        #Sets header names
+        self.tableModel.setHeaderData(0,  Qt.Horizontal, "ID")
+        self.tableModel.setHeaderData(1, Qt.Horizontal, "domain name")
             
-            retrieveDataQuery = QSqlQuery("SELECT id, domain FROM domains")
+        retrieveDataQuery = QSqlQuery("SELECT id, domain FROM domains")
 
-            #Retrives data from database and inputs into model
-            while retrieveDataQuery.next():
-                rows = self.tableModel.rowCount()
-                self.tableModel.insertRow(retrieveDataQuery.value(0))
+        #Retrives data from database and inputs into model
+        while retrieveDataQuery.next():
+            rows = self.tableModel.rowCount()
+            self.tableModel.insertRow(retrieveDataQuery.value(0))
 
 
             
 
-            #Generate View
-            self.tableModel.select()
-            self.domainTableView.setModel(self.tableModel)
-            #Resize Columns
-            self.domainTableView.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+        #Generate View
+        self.tableModel.select()
+        self.domainTableView.setModel(self.tableModel)
+        #Resize Columns
+        self.domainTableView.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
 
-          
-            
-        createTableModel()
+    def inputDomain(self):
 
+        inputDomainQuery = QSqlQuery()
+
+        inputDomainQuery.prepare(
+            """
+            INSERT INTO domains (
+                domain
+            )
+            VALUES (?)
+            """
+        )
+
+        inputDomainQuery.addBindValue(self.domainInput.text())
+        inputDomainQuery.exec()
+        
+        
+        
+
+        
+       
 
 
 
