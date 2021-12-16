@@ -1,50 +1,58 @@
+import configparser
 import sys
 
 import PyQt5
-from PyQt5 import (
-    QtGui, 
-    QtWidgets, 
-    QtCore
-   
-
-)
-from PyQt5.uic import loadUi
+from PyQt5.QtSql import *
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableView, QTableWidgetItem
+from PyQt5.uic import loadUi
 
-from PyQt5.QtWidgets import (
-    QApplication,
-    QMessageBox,
-    QMainWindow,
-    QTableView
-
-)
-from PyQt5.QtSql import (
-    QSqlDatabase, 
-    QSqlTableModel
-
-)
 from package.mainUi import Ui_MainWindow
-import configparser
+
 
 class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
 
-        #create model for table
-        self.tableModel = QSqlTableModel(self)
-        self.tableModel.setTable("domains")
-        self.tableModel.setEditStrategy(QSqlTableModel.OnFieldChange)
-        
-        self.tableModel.setHeaderData(0,  Qt.Horizontal, "ID")
-        self.tableModel.setHeaderData(1, Qt.Horizontal, "domain name")
-        
+        def createTableModel():
+            #create model for table
+            self.tableModel = QSqlTableModel(self)
+            self.tableModel.setTable("domains")
+            self.tableModel.setEditStrategy(QSqlTableModel.OnFieldChange)
 
-        self.tableModel.select()
 
-        #Generate View
-        self.domainTableView.setModel(self.tableModel)
-        self.domainTableView.resizeColumnsToContents()
+
+
+            #Sets header names
+            self.tableModel.setHeaderData(0,  Qt.Horizontal, "ID")
+            self.tableModel.setHeaderData(1, Qt.Horizontal, "domain name")
+            
+            
+            retrieveDataQuery = QSqlQuery("SELECT id, domain FROM domains")
+
+            #Retrives data from database and inputs into model
+            while retrieveDataQuery.next():
+                rows = self.tableModel.rowCount()
+                self.tableModel.insertRow(retrieveDataQuery.value(0))
+
+
+            
+
+            #Generate View
+            self.tableModel.select()
+            self.domainTableView.setModel(self.tableModel)
+            #Resize Columns
+            self.domainTableView.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+
+          
+            
+        createTableModel()
+
+
+
+
         
 
 
@@ -55,14 +63,10 @@ def openDatabaseConnection():
     connParam = configObject['dbconnection']
     
     #// Inupts connection data //
-    db = QSqlDatabase.addDatabase('QMARIADB')
-    db.setHostName(connParam['servername'])
+    db = QSqlDatabase.addDatabase('QSQLITE')
     db.setDatabaseName(connParam['db'])
-    db.setUserName(connParam['username'])
-    db.setPassword(connParam['password'])
 
-    
-     #// attempts to connect 
+    #// attempts to connect 
     if not db.open():
         QMessageBox.critical(
             None,
@@ -70,26 +74,18 @@ def openDatabaseConnection():
             "database error: %s" % db.lastError().databaseText(),
         )            
         return False
+    
+    #Generates Query object
+    
+
+
     return True
     
 
 
-    #    self.completed = 0
-        
-    #//////Testing how to refer to objects and maniplulate////
-    #    self.initiateManualScan.clicked.connect(self.increaseProgress)
-    #
-    #def increaseProgress(self):
-    #    
-    #    self.completed += 1
-    #    self.scanProgressBar.setValue(self.completed)
-
-    #/////////////////////////////////////////////////////////
-
-
 if __name__ == '__main__': # Automatically builds the objects when the program is loaded
     
-    if not openDatabaseConnection():
+    if not openDatabaseConnection(): # Attempts to connect to the database 
         sys.exit(1)
     
     app = QtWidgets.QApplication(sys.argv)
