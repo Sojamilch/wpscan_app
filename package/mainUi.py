@@ -15,7 +15,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(400, 400)
+        MainWindow.setFixedSize(400, 400)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
@@ -83,7 +83,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Wordpress Vunerabiltiy Scanner"))
         self.initiateManualScan.setText(_translate("MainWindow", "SCAN"))
         self.automationEnable.setText(_translate("MainWindow", "Automate?"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.scanTab), _translate("MainWindow", "Scan"))
