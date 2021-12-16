@@ -75,7 +75,7 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.menubar.addAction(self.menuWordPress_Scan.menuAction())
+        
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(1)

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableView, 
 from PyQt5.uic import loadUi
 
 from package.mainUi import Ui_MainWindow
-
+from package.databaseMigration import databaseCheck
 
 class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -17,18 +17,17 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         def createTableModel():
+            #Checks if database exists if not generates it    
+            databaseCheck() 
+
             #create model for table
             self.tableModel = QSqlTableModel(self)
             self.tableModel.setTable("domains")
             self.tableModel.setEditStrategy(QSqlTableModel.OnFieldChange)
 
-
-
-
             #Sets header names
             self.tableModel.setHeaderData(0,  Qt.Horizontal, "ID")
             self.tableModel.setHeaderData(1, Qt.Horizontal, "domain name")
-            
             
             retrieveDataQuery = QSqlQuery("SELECT id, domain FROM domains")
 
