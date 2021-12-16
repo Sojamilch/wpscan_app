@@ -15,8 +15,8 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-
-        def createTableModel():
+        
+        def createTableModel(): # Creates data model for domain table view
             #Checks if database exists if not generates it    
             databaseCheck() 
 
