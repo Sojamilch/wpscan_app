@@ -1,7 +1,7 @@
 # wpscan app for MCS Yeovil
 
 
-Designed using Qt Desinger 
+Designed using Qt Designer 
 
 Package dependencies:
 
