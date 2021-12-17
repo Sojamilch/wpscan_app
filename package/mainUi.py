@@ -63,6 +63,16 @@ class Ui_MainWindow(object):
         self.syncList.setGeometry(QtCore.QRect(685, 110, 100, 25))
         self.syncList.setObjectName("syncList")
         
+        self.selectDay = QtWidgets.QComboBox(self.domainList)
+        self.selectDay.setGeometry(QtCore.QRect(10, 70, 270, 26))
+        self.selectDay.setObjectName("selectDay")
+        self.selectDay.addItem("Monday")
+        self.selectDay.addItem("Tuesday")
+        self.selectDay.addItem("Wednesday")
+        self.selectDay.addItem("Thursday")
+        self.selectDay.addItem("Friday")
+
+
         self.tabWidget.addTab(self.domainList, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
@@ -93,6 +103,7 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "Add Domain"))
         self.addDomain.setText(_translate("MainWindow", "Add domain"))
         self.syncList.setText(_translate("MainWindow", "Sync List"))
+        
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.domainList), _translate("MainWindow", "Domains"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Schedule"))
         self.menuWordPress_Scan.setTitle(_translate("MainWindow", "WordPress Scanner"))

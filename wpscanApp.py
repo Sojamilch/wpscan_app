@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QTableView, 
 from PyQt5.uic import loadUi
 
 from package.mainUi import Ui_MainWindow
-from package.databaseMigration import databaseCheck
+from package.databaseMigration import databaseControlling
 
 class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -26,7 +26,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
 
         #Checks if database exists if not generates it    
-        databaseCheck() 
+        databaseControlling.databaseCheck(self) 
 
         #create model for table
         self.tableModel = QSqlTableModel(self)
@@ -49,25 +49,14 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.domainTableView.setModel(self.tableModel)
         #Resize Columns
         self.domainTableView.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+        self.domainTableView.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeToContents)
+        self.domainTableView.horizontalHeader().setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
+        self.domainTableView.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
+        self.domainTableView.horizontalHeader().setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeToContents)
+
 
     def inputDomain(self): # Adds domains to SQLite database
-        inputDay = ''
-
-
-
-        inputDomainQuery = QSqlQuery()
-
-        inputDomainQuery.prepare(
-            """
-            INSERT INTO domains (
-                domain
-            )
-            VALUES (?)
-            """
-        )
-
-        inputDomainQuery.addBindValue(self.domainInput.text())
-        inputDomainQuery.exec()
+        databaseControlling.inputDomain(self, str(self.selectDay.currentText()), self.domainInput.text())
         
     def wpscanManual(self):
         subprocess.run('shellScripts/wpscan.sh')
