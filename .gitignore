@@ -141,3 +141,4 @@ package/db.ini
 .wpscanDomainList.db
 .wpscanDomainList
 wpscanDomainList.db
+shellScripts/wpwatcher.conf

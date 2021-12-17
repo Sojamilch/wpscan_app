@@ -1,6 +1,6 @@
 import configparser
 import sys
-
+import subprocess
 import PyQt5
 from PyQt5.QtSql import *
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -19,8 +19,12 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.addDomain.clicked.connect(self.inputDomain) # Detects when button is clicked
         self.syncList.clicked.connect(self.createTableModel) # Syncs domain list to latest version of list
-        
+        self.initiateManualScan.clicked.connect(self.wpscanManual) # Starts a manual wpscan of all the websites on the selected day
+
     def createTableModel(self): # Creates data model for domain table view
+        
+
+
         #Checks if database exists if not generates it    
         databaseCheck() 
 
@@ -31,17 +35,14 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         #Sets header names
         self.tableModel.setHeaderData(0,  Qt.Horizontal, "ID")
-        self.tableModel.setHeaderData(1, Qt.Horizontal, "domain name")
+        
             
-        retrieveDataQuery = QSqlQuery("SELECT id, domain FROM domains")
+        retrieveDataQuery = QSqlQuery("SELECT id, monday,tuesday, wednesday, thursday, friday FROM domains")
 
         #Retrives data from database and inputs into model
         while retrieveDataQuery.next():
             rows = self.tableModel.rowCount()
             self.tableModel.insertRow(retrieveDataQuery.value(0))
-
-
-            
 
         #Generate View
         self.tableModel.select()
@@ -49,7 +50,10 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         #Resize Columns
         self.domainTableView.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
 
-    def inputDomain(self):
+    def inputDomain(self): # Adds domains to SQLite database
+        inputDay = ''
+
+
 
         inputDomainQuery = QSqlQuery()
 
@@ -65,7 +69,11 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         inputDomainQuery.addBindValue(self.domainInput.text())
         inputDomainQuery.exec()
         
-        
+    def wpscanManual(self):
+        subprocess.run('shellScripts/wpscan.sh')
+
+
+
         
 
         
@@ -84,7 +92,6 @@ def openDatabaseConnection():
     
     #// Inupts connection data //
     db = QSqlDatabase.addDatabase('QSQLITE')
-    db.setDatabaseName(connParam['db'])
 
     #// attempts to connect 
     if not db.open():
@@ -95,8 +102,7 @@ def openDatabaseConnection():
         )            
         return False
     
-    #Generates Query object
-    
+ 
 
 
     return True
