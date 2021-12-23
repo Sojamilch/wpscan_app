@@ -52,10 +52,8 @@ class databaseControlling():
         if day == "Monday":
             inputDomainQuery.prepare(
             """
-            INSERT INTO domains (
-                monday
-            )
-            VALUES ( ? )
+            UPDATE domains SET monday = swaws WHERE monday = NULL AND id = 1
+            
             """
             )
         elif day == "Tuesday":

@@ -57,6 +57,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def inputDomain(self): # Adds domains to SQLite database
         databaseControlling.inputDomain(self, str(self.selectDay.currentText()), self.domainInput.text())
+        self.tableModel.select()
         
     def wpscanManual(self):
         subprocess.run('shellScripts/wpscan.sh')
