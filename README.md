@@ -8,4 +8,4 @@ Package dependencies:
 - Python 3.8
 - PyQt5 
 - PyQt5-Tools
-- Sqlite 3
+- pandas 
