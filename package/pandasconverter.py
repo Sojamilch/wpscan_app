@@ -1,7 +1,7 @@
 import os.path
 from os import close
 from posixpath import defpath
-
+import numpy as np
 import pandas as pd
 from PyQt5.QtCore import QAbstractTableModel, Qt
 from PyQt5.QtSql import *
@@ -10,7 +10,7 @@ from PyQt5.QtSql import *
 class DomainsTableModel(QAbstractTableModel):
     
 
-    df = pd.read_csv('./domains/domains.csv')
+  
 
     def __init__(self, data):
         QAbstractTableModel.__init__(self)
@@ -33,100 +33,37 @@ class DomainsTableModel(QAbstractTableModel):
             return self._data.columns[col]
         return None
 
-
-
-
-
-    #def databaseCheck(self): # Commented out for testing purposes (OLD USED FOR SQLite DATABASE HANDLING)
-        
-       
-
-        
-    #     db = QSqlDatabase.addDatabase("QSQLITE")
-    #     db.setDatabaseName("wpscanDomainList.db")
-    #     db.open()
-    #     createTable = QSqlQuery()
-    #     createTable.exec( # Creates database to store domain names
-    #         """
-    #         CREATE TABLE domains (
-    #             id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
-    #             monday VARCHAR(100) UNIQUE,
-    #             tuesday VARCHAR(100) UNIQUE,
-    #             wednesday VARCHAR(100) UNIQUE,
-    #             thursday VARCHAR(100) UNIQUE,
-    #             friday VARCHAR(100) UNIQUE 
-    #             )
-    #         """
-    #     )
-        
-    #     #with open('domains/domains.txt') as d:
-    #     #       domains = d.readlines()
-
-    #     #for line in domains: # inputs into database already existing domains in txt file
-    #     #    inputDomainQuery = QSqlQuery()
-    # #
-    #     #    inputDomainQuery.prepare(
-    #     #        """
-    #     #        INSERT INTO domains (
-    #     #            domain
-    #     #        )
-    #     #        VALUES (?)
-    #     #        """
-    #     #    )
-    #     #    inputDomainQuery.addBindValue(line)
-    #     #    inputDomainQuery.exec()
-    #     return print(db.tables())
-
-    # def inputDomain(self, day, value):
-
-    #     inputDomainQuery = QSqlQuery()
-
-    #     if day == "Monday":
-    #         inputDomainQuery.prepare(
-    #         """
-    #         UPDATE domains SET monday = swaws WHERE monday = NULL AND id = 1
-            
-    #         """
-    #         )
-    #     elif day == "Tuesday":
-    #         inputDomainQuery.prepare(
-    #         """
-    #         INSERT INTO domains (
-    #             tuesday
-    #         )
-    #         VALUES ( ? )
-    #         """
-    #         )
-    #     elif day == "Wednesday":
-    #         inputDomainQuery.prepare(
-    #         """
-    #         INSERT INTO domains (
-    #             wednesday
-    #         )
-    #         VALUES ( ? )
-    #         """
-    #         )
-    #     elif day == "Thursday":
-    #         inputDomainQuery.prepare(
-    #         """
-    #         INSERT INTO domains (
-    #             thursday
-    #         )
-    #         VALUES ( ? )
-    #         """
-    #         )
-    #     elif day == "Friday":
-    #         inputDomainQuery.prepare(
-    #         """
-    #         INSERT INTO domains (
-    #             friday
-    #         )
-    #         VALUES ( ? )
-    #         """
-    #         )
     
-    #     inputDomainQuery.addBindValue(value)
-    #     inputDomainQuery.exec()
-        
-    
+class DomainInput():
 
+    
+    def input(self, dayOfWeek, domainName, df):
+        
+
+        
+        dayOfWeek = dayOfWeek.lower()
+
+
+        weekdays = {
+            "monday":"0",
+            "tuesday":"1",
+            "wednesday":"2",
+            "thursday":"3",
+            "friday":"4"
+        }
+
+
+        dayOfWeekInt = int(weekdays.get(dayOfWeek))
+
+        print(dayOfWeek,dayOfWeekInt, domainName)
+
+        for index in df.index:
+            print(index)
+            print(df.at[index,0])
+            if df.isnull(df.at[index,0]) == True:
+                df.loc[index, dayOfWeek] = domainName
+                print(df)
+                df.to_csv(index=False)
+                return None
+
+        
