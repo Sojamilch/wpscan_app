@@ -13,9 +13,7 @@ class DomainsTableModel(QAbstractTableModel): # Generates a model for a tablevie
 
     def __init__(self, data):
         QAbstractTableModel.__init__(self)
-        
-        
-
+    
         self._data = data
         
     def rowCount(self, parent=None):

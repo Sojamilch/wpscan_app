@@ -3,7 +3,7 @@
 
 Designed using Qt Designer 
 
-Package dependencies:
+dependencies:
 
 - Python 3.8    
 - PyQt5 

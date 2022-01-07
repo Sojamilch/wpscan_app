@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
                              QTableView, QTableWidgetItem)
 from PyQt5.uic import loadUi
 
-from package.mainUi import Ui_MainWindow
-from package.pandascontroller import DomainInput, DomainsTableModel
+from mainUi import Ui_MainWindow
+from pandascontroller import DomainInput, DomainsTableModel
 
 
 
@@ -32,7 +32,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         ### Syncs domain list to latest version of list ###
         self.syncList.clicked.connect(self.syncDomainList) 
-        
 
         ### Starts a manual wpscan of all the websites on the selected day (WIP) ###
         self.initiateManualScan.clicked.connect(self.wpscanManual) 
@@ -56,7 +55,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         
 
-    def syncDomainList(self):
+    def syncDomainList(self): # this is ran when the data in the tabelview changes updating the csv
 
         self.data.to_csv("./domains/domains.csv", index=False)
 
@@ -65,7 +64,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def inputDomain(self): # Adds domains to CSV
         
         DomainInput.input(self, str(self.selectDay.currentText()), self.domainInput.text(), self.data)
-        #self.tableModel.select()
+        
         
     def wpscanManual(self):
         subprocess.run('shellScripts/wpscan.sh')
