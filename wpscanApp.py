@@ -12,14 +12,14 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
 from PyQt5.uic import loadUi
 
 from package.mainUi import Ui_MainWindow
-from package.pandasconverter import DomainInput, DomainsTableModel
+from package.pandascontroller import DomainInput, DomainsTableModel
 
 
 class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-
+        
     
 
         self.createTableModel()
@@ -40,13 +40,12 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         data = pd.read_csv('./domains/domains.csv')
         
-        print(data.head())
+        print(data.head())  
 
-        model = DomainsTableModel(data)
+        model = DomainsTableModel(data) # creates te model
 
         ### Sets the model created by the pandasconverter.py ###
         self.domainTableView.setModel(model)
-
 
 
     def inputDomain(self): # Adds domains to CSV
