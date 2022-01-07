@@ -15,12 +15,14 @@ from package.mainUi import Ui_MainWindow
 from package.pandascontroller import DomainInput, DomainsTableModel
 
 
+
 class window(QtWidgets.QMainWindow, Ui_MainWindow):
+    
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
         
-    
+        self.data = pd.read_csv('./domains/domains.csv')
 
         self.createTableModel()
         
@@ -29,28 +31,40 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.addDomain.clicked.connect(self.inputDomain) 
 
         ### Syncs domain list to latest version of list ###
-        self.syncList.clicked.connect(self.createTableModel) 
+        self.syncList.clicked.connect(self.syncDomainList) 
+        
 
         ### Starts a manual wpscan of all the websites on the selected day (WIP) ###
         self.initiateManualScan.clicked.connect(self.wpscanManual) 
+
+        
 
     def createTableModel(self): ### Creates data model for domain table view ###
         
         ### uses pandas to read he csv file and generate a dataframe/overwrite if re-run ###
         
-        data = pd.read_csv('./domains/domains.csv')
+        #data = pd.read_csv('./domains/domains.csv')
         
-        print(data.head())  
+        print(self.data.head())  
 
-        model = DomainsTableModel(data) # creates te model
+        model = DomainsTableModel(self.data) # creates te model
+
+        model.dataChanged.connect(self.syncDomainList)
 
         ### Sets the model created by the pandasconverter.py ###
         self.domainTableView.setModel(model)
 
+        
+
+    def syncDomainList(self):
+
+        self.data.to_csv("./domains/domains.csv", index=False)
+
+
 
     def inputDomain(self): # Adds domains to CSV
-        data = pd.read_csv('./domains/domains.csv')
-        DomainInput.input(self, str(self.selectDay.currentText()), self.domainInput.text(), data)
+        
+        DomainInput.input(self, str(self.selectDay.currentText()), self.domainInput.text(), self.data)
         #self.tableModel.select()
         
     def wpscanManual(self):

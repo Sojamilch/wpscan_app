@@ -14,7 +14,7 @@ class DomainsTableModel(QAbstractTableModel): # Generates a model for a tablevie
     def __init__(self, data):
         QAbstractTableModel.__init__(self)
         
-        data.to_csv("./domains/domains.csv", index=False)
+        
 
         self._data = data
         
@@ -65,19 +65,6 @@ class DomainsTableModel(QAbstractTableModel): # Generates a model for a tablevie
         return flags
     
 
-class domianEditorDelegate(QtWidgets.QstyledItemDelegate):
-    def createEditor(self, parent, option, index):
-        editor = QtWidgets.QComboBox(parent)
-        value = index.data()
-        options = [value, 'Option 1','Option 2','Option 3','Option 4','Default']
-        editor.addItems(options)
-        editor.currentTextChanged.connect(self.commitAndCloseEditor)
-        return editor
-
-    @QtCore.pyqtSlot()
-    def commitAndCloseEditor(self):
-        editor = self.sender()
-        self.commitData.emit(editor)
 
 
 class DomainInput():
