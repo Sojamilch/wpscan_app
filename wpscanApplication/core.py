@@ -1,4 +1,6 @@
+from calendar import week, weekday
 import configparser
+from os import PRIO_PGRP
 import subprocess
 import sys
 
@@ -25,7 +27,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.data = self.readCsvData()
      
-        if self.data.shape[0] == 0:
+        if self.data.shape[0] == 0: # Adds a blank line to the end of the dataframe if there are no rows
             self.data = self.data.append(pd.Series(), ignore_index=True)
             self.updateDomainList()
 
@@ -53,7 +55,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         ### uses pandas to read he csv file and generate a dataframe/overwrite if re-run ###
         
-        #data = pd.read_csv('./domains/domains.csv')
         
         print(self.data.head())  
 
@@ -71,10 +72,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.data.to_csv("./domains/domains.csv", index=False)
         
-   
-
-
-
 
     def inputDomain(self): # Adds domains to CSV then refreshes table model with newest version
         
@@ -83,10 +80,46 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.createTableModel()
 
-        #str(self.selectDay.currentText())
+      
         
+
+
+
+
+
     def wpscanManual(self):
-        subprocess.run('shellScripts/wpscan.sh')
+
+        wpConfig = configparser.ConfigParser()
+        
+        wpConfig.read('./shellScripts/wpwatcher.conf')
+        print(wpConfig['wpwatcher']['wp_sites'])
+
+        selectedDay = self.selectDay.currentText()
+        selectedDay = selectedDay.lower()
+
+        listOfWebsites = self.data[selectedDay].tolist()
+        
+        cleanWebsiteList = []
+        
+        try:
+            for website in listOfWebsites:
+                
+                temp = '{"url": '+'"'+ website +'"}'
+
+                cleanWebsiteList.append(temp)
+        except:
+            print("null value")
+
+        cleanWebsiteList = ' , '.join(cleanWebsiteList)
+        print(cleanWebsiteList)
+        wpConfig['wpwatcher']['wp_sites'] = "[" + cleanWebsiteList + "]"
+
+        print(wpConfig['wpwatcher']['wp_sites'])
+
+        with open('./shellScripts/wpwatcher.conf', 'w') as configFile:
+            wpConfig.write(configFile)
+
+        subprocess.run(['bash', 'shellScripts/wpscan.sh' , 'foo' ])
     
 
 

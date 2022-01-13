@@ -63,14 +63,14 @@ class Ui_MainWindow(object):
         self.syncList.setGeometry(QtCore.QRect(685, 110, 100, 25))
         self.syncList.setObjectName("syncList")
         
-        # self.selectDay = QtWidgets.QComboBox(self.domainList)
-        # self.selectDay.setGeometry(QtCore.QRect(10, 70, 270, 26))
-        # self.selectDay.setObjectName("selectDay")
-        # self.selectDay.addItem("Monday")
-        # self.selectDay.addItem("Tuesday")
-        # self.selectDay.addItem("Wednesday")
-        # self.selectDay.addItem("Thursday")
-        # self.selectDay.addItem("Friday")
+        self.selectDay = QtWidgets.QComboBox(self.scanTab)
+        self.selectDay.setGeometry(QtCore.QRect(300, 300, 200, 26))
+        self.selectDay.setObjectName("selectDay")
+        self.selectDay.addItem("Monday")
+        self.selectDay.addItem("Tuesday")
+        self.selectDay.addItem("Wednesday")
+        self.selectDay.addItem("Thursday")
+        self.selectDay.addItem("Friday")
 
 
         self.tabWidget.addTab(self.domainList, "")
