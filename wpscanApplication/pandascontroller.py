@@ -74,7 +74,7 @@ class DomainInput(): # writes domains into the csv ]
 
 
         def writeToCv():
-            df.to_csv("./domains/domains.csv", index=False)
+            df.to_csv("../domains/domains.csv", index=False)
             
 
         

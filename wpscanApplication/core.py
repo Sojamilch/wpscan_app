@@ -1,13 +1,12 @@
-from calendar import week, weekday
 import configparser
-from os import PRIO_PGRP
+import os
 import subprocess
 import sys
+from calendar import week, weekday
 
-import pandas as pd
 import numpy
+import pandas as pd
 import PyQt5
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
@@ -23,8 +22,8 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+
     
-        
         self.data = self.readCsvData()
      
         if self.data.shape[0] == 0: # Adds a blank line to the end of the dataframe if there are no rows
@@ -49,7 +48,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.initiateManualScan.clicked.connect(self.wpscanManual) 
 
     def readCsvData(self):
-        return pd.read_csv('./domains/domains.csv')        
+        return pd.read_csv('../domains/domains.csv')        
 
     def createTableModel(self): ### Creates data model for domain table view ###
         
@@ -70,7 +69,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def updateDomainList(self): # this is ran when the data in the tabelview changes updating the csv
 
         
-        self.data.to_csv("./domains/domains.csv", index=False)
+        self.data.to_csv("../domains/domains.csv", index=False)
         
 
     def inputDomain(self): # Adds domains to CSV then refreshes table model with newest version
@@ -91,7 +90,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         wpConfig = configparser.ConfigParser()
         
-        wpConfig.read('./shellScripts/wpwatcher.conf')
+        wpConfig.read('../shellScripts/wpwatcher.conf')
         print(wpConfig['wpwatcher']['wp_sites'])
 
         selectedDay = self.selectDay.currentText()
@@ -116,10 +115,16 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         print(wpConfig['wpwatcher']['wp_sites'])
 
-        with open('./shellScripts/wpwatcher.conf', 'w') as configFile:
+        with open('../shellScripts/wpwatcher.conf', 'w') as configFile:
             wpConfig.write(configFile)
 
-        subprocess.run(['bash', 'shellScripts/wpscan.sh' , 'foo' ])
+        #os.chdir("shellScripts")
+
+        absoluteConfigPath = os.path.abspath("../shellScripts/wpwatcher.conf")
+
+        print(absoluteConfigPath)
+        #os.chdir("wpscanApplication")
+        subprocess.run(['bash', 'shellScripts/wpscan.sh', absoluteConfigPath])
     
 
 
