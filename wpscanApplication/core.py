@@ -27,7 +27,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
      
         if self.data.shape[0] == 0:
             self.data = self.data.append(pd.Series(), ignore_index=True)
-            self.syncDomainList()
+            self.updateDomainList()
 
         
 
@@ -40,7 +40,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         ### Syncs domain list to latest version of list ###
         
-        self.syncList.clicked.connect(self.syncDomainList) 
+        self.syncList.clicked.connect(self.updateDomainList) 
        
 
         ### Starts a manual wpscan of all the websites on the selected day (WIP) ###
