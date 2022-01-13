@@ -2,9 +2,10 @@ import configparser
 import subprocess
 import sys
 
-import numpy
 import pandas as pd
+import numpy
 import PyQt5
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
@@ -15,28 +16,38 @@ from mainUi import Ui_MainWindow
 from pandascontroller import DomainInput, DomainsTableModel
 
 
-
 class window(QtWidgets.QMainWindow, Ui_MainWindow):
     
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+    
         
-        self.data = pd.read_csv('./domains/domains.csv')
+        self.data = self.readCsvData()
+     
+        if self.data.shape[0] == 0:
+            self.data = self.data.append(pd.Series(), ignore_index=True)
+            self.syncDomainList()
+
+        
 
         self.createTableModel()
         
 
         ### Detects when button is clicked and runs inputdomain() ###
         self.addDomain.clicked.connect(self.inputDomain) 
+        
 
         ### Syncs domain list to latest version of list ###
+        
         self.syncList.clicked.connect(self.syncDomainList) 
+       
 
         ### Starts a manual wpscan of all the websites on the selected day (WIP) ###
         self.initiateManualScan.clicked.connect(self.wpscanManual) 
 
-        
+    def readCsvData(self):
+        return pd.read_csv('./domains/domains.csv')        
 
     def createTableModel(self): ### Creates data model for domain table view ###
         
@@ -48,23 +59,31 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         model = DomainsTableModel(self.data) # creates te model
 
-        model.dataChanged.connect(self.syncDomainList)
+        model.dataChanged.connect(self.updateDomainList)
 
         ### Sets the model created by the pandasconverter.py ###
         self.domainTableView.setModel(model)
 
         
 
-    def syncDomainList(self): # this is ran when the data in the tabelview changes updating the csv
+    def updateDomainList(self): # this is ran when the data in the tabelview changes updating the csv
 
+        
         self.data.to_csv("./domains/domains.csv", index=False)
-
-
-
-    def inputDomain(self): # Adds domains to CSV
         
-        DomainInput.input(self, str(self.selectDay.currentText()), self.domainInput.text(), self.data)
+   
+
+
+
+
+    def inputDomain(self): # Adds domains to CSV then refreshes table model with newest version
         
+        self.updateDomainList()
+        self.data = DomainInput.input(self, self.domainInput.text(), self.readCsvData())
+        
+        self.createTableModel()
+
+        #str(self.selectDay.currentText())
         
     def wpscanManual(self):
         subprocess.run('shellScripts/wpscan.sh')

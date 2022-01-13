@@ -1,6 +1,9 @@
 import os.path
+from cmath import isnan
+from distutils.fancy_getopt import wrap_text
 from os import close
 from posixpath import defpath
+
 import numpy as np
 import pandas as pd
 from PyQt5 import QtCore, QtWidgets, uic
@@ -8,12 +11,12 @@ from PyQt5.QtCore import QAbstractTableModel, Qt
 from PyQt5.QtSql import *
 
 
-class DomainsTableModel(QAbstractTableModel): # Generates a model for a tableview 
+class DomainsTableModel(QAbstractTableModel): # Generates a model for a tableview using pandas dataframes as the data
     
 
     def __init__(self, data):
         QAbstractTableModel.__init__(self)
-    
+        
         self._data = data
         
     def rowCount(self, parent=None):
@@ -52,7 +55,7 @@ class DomainsTableModel(QAbstractTableModel): # Generates a model for a tablevie
             return False
 
         self._data.values[row][column] = value
-        self.dataChanged.emit(index, index)
+        self.dataChanged.emit(index, index) # allows detection of changes in tableviewdata 
         return True
 
     def flags(self, index):
@@ -65,47 +68,43 @@ class DomainsTableModel(QAbstractTableModel): # Generates a model for a tablevie
 
 
 
-class DomainInput():
+class DomainInput(): # writes domains into the csv ]
+
+    def input(self, domainName, df):
 
 
-    # def __init__(self):
+        def writeToCv():
+            df.to_csv("./domains/domains.csv", index=False)
+            
 
-    #     df = pd.read_csv("./domains/domains.csv")
-
-    #     df = df.fillna(0)
-
-    #     print(df)
-
-    def input(self, dayOfWeek, domainName, df):
         
-        df = df.fillna(' ')
-
-        print(df)
-
-        dayOfWeek = dayOfWeek.lower()
-
-
-        weekdays = {
-            "monday":"0",
-            "tuesday":"1",
-            "wednesday":"2",
-            "thursday":"3",
-            "friday":"4"
-        }
-
-
-        dayOfWeekInt = int(weekdays.get(dayOfWeek))
-
-        #print(dayOfWeek,dayOfWeekInt, domainName)
 
         for index in df.index:
-            if df.at[index,dayOfWeek] == ' ':
-                df.at[index, dayOfWeek] = domainName
-                print(df.at[index, dayOfWeek], "Wrote to CSV!")
-                df.to_csv("./domains/domains.csv", index=False)
-                return None
-            
-    
+
+            for dayOfWeek in range(0,5):
+                
+
+                #print(df.index, dayOfWeek) # DEBUG PURPOSES
+
+                try:
+                    nextCell = df.iat[index, dayOfWeek]
+
+                    if nextCell is None or np.isnan(nextCell) or df.isnull(nextCell) or pd.isna(nextCell): #detects if cell is null value/nothing in cell
+                        df.iat[index, dayOfWeek] = domainName #replaces said cell with input domain
+                        writeToCv() # saves cv
+                        return df
+                except: 
+                    #print(nextCell, "Is not null/nan") DEBUG PURPOSES
+                    if nextCell == df.iat[-1,-1]: # if at last value of dataframe add new line to end of dataframe 
+                        print("adding new empty line")
+                        df = df.append(pd.Series(), ignore_index=True)
+                        writeToCv()
+
+        return df
+
+                
+
+        
                 
 
         
