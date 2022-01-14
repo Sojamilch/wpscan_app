@@ -81,16 +81,16 @@ class DomainInput(): # writes domains into the csv ]
 
         for index in df.index:
 
-            for dayOfWeek in range(0,21):
+            for dayOfMonth in range(0,21):
                 
 
                 #print(df.index, dayOfWeek) # DEBUG PURPOSES
 
                 try:
-                    nextCell = df.iat[index, dayOfWeek]
+                    nextCell = df.iat[index, dayOfMonth]
 
                     if nextCell is None or np.isnan(nextCell) or df.isnull(nextCell) or pd.isna(nextCell): #detects if cell is null value/nothing in cell
-                        df.iat[index, dayOfWeek] = domainName #replaces said cell with input domain
+                        df.iat[index, dayOfMonth] = domainName #replaces said cell with input domain
                         writeToCv() # saves cv
                         print(df)
                         return df

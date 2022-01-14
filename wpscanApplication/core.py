@@ -23,7 +23,14 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
 
-    
+
+        self.weekList = {
+
+            "Week 2":".1",
+            "Week 3":".2",
+            "Week 4":".3"
+
+        }
         self.data = pd.read_csv('../domains/domains.csv')   
 
         if self.data.shape[0] == 0: # Adds a blank line to the end of the dataframe if there are no rows
@@ -33,12 +40,14 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         
 
-        self.createTableModel()
+        
         
         
         ### Detects when button is clicked and runs inputdomain() ###
         self.addDomain.clicked.connect(self.inputDomain) 
         
+        self.selectDomainWeek.activated.connect(self.createTableModel)
+
 
         ### Syncs domain list to latest version of list ###
         
@@ -50,24 +59,43 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
          
 
+    
+    ### Domain Table View Logic ### 
+    
+    
     def createTableModel(self): ### Creates data model for domain table view ###
         
-        ### uses pandas to read he csv file and generate a dataframe/overwrite if re-run ###
-        
-        
-        print(self.data) 
+        ### uses pandas to read he csv file and generate a dataframe/overwrite if re-run ### #
 
-        model = DomainsTableModel(self.data) # creates the model
-        
 
+        for i in range(0,5):
+            if self.selectDomainWeek.currentText() in self.weekList:
+
+                domanListData = self.data.loc[:, self.weekList]
+        if self.selectDomainWeek.currentText() == "Week 1":
+
+            domainListData = self.data.loc[:, "monday":"friday"]
+
+        elif self.selectDomainWeek.currentText() == "Week 2":
+            
+            domainListData = self.data.loc[:, "monday.1":"friday.1"]
+
+        elif self.selectDomainWeek.currentText() == "Week 3":
+            
+            domainListData = self.data.loc[:, "monday.2":"friday.2"]
+
+        elif self.selectDomainWeek.currentText() == "Week 4":
+            
+            domainListData = self.data.loc[:, "monday.3":"friday.3"]
+
+
+        model = DomainsTableModel(domainListData) # creates the model
+        
         ### Sets the model created by the pandasconverter.py ###
 
         self.domainTableView.setModel(model)
 
         model.dataChanged.connect(self.updateDomainList)
-
-        
-        
 
     #def readCsvData(self): #OLD CODE
      #   print("read csv")
@@ -91,26 +119,30 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
       
         
+    ### End of domain tableview logic ###
 
 
 
 
-
-    def wpscanManual(self):
+    def wpscanManual(self): # Changes the websites that are going to be run in the config, then executest the scan
 
         wpConfig = configparser.ConfigParser()
         
-        wpConfig.read('../shellScripts/wpwatcher.conf')
+        wpConfig.read('../shellScripts/wpwatcher.conf') # reading config
         print(wpConfig['wpwatcher']['wp_sites'])
 
+
+
+
+
         selectedDay = self.selectDay.currentText()
-        selectedDay = selectedDay.lower()
+        selectedDay = selectedDay.lower() # for which day to manually scan
 
         listOfWebsites = self.data[selectedDay].tolist()
         
         cleanWebsiteList = []
         
-        try:
+        try: # incase website is invalid value it will just ignore it
             for website in listOfWebsites:
                 
                 temp = '{"url": '+'"'+ website +'"}'
@@ -119,7 +151,9 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         except:
             print("null value")
 
-        cleanWebsiteList = ' , '.join(cleanWebsiteList)
+        
+        #formatting list to match original reuqirements 
+        cleanWebsiteList = ' , '.join(cleanWebsiteList) 
         print(cleanWebsiteList)
         wpConfig['wpwatcher']['wp_sites'] = "[" + cleanWebsiteList + "]"
 
@@ -128,14 +162,12 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         with open('../shellScripts/wpwatcher.conf', 'w') as configFile:
             wpConfig.write(configFile)
 
-        
+        #writes updated config back to file
 
-        absoluteConfigPath = os.path.abspath("../shellScripts/wpwatcher.conf")
+        absoluteConfigPath = os.path.abspath("../shellScripts/wpwatcher.conf") # retrieves path for config location
 
-        print(absoluteConfigPath)
-        
-        subprocess.run(['bash', '../shellScripts/wpscan.sh', absoluteConfigPath])
-    
+        subprocess.run(['bash', '../shellScripts/wpscan.sh', absoluteConfigPath]) # executes script
+
 
 
 if __name__ == '__main__': # Automatically builds the objects when the program is loaded
