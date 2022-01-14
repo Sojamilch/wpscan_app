@@ -2,7 +2,7 @@ import configparser
 import os
 import subprocess
 import sys
-from calendar import week, weekday
+from calendar import c, week, weekday
 
 import numpy
 import pandas as pd
@@ -24,58 +24,68 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
     
-        self.data = self.readCsvData()
-     
+        self.data = pd.read_csv('../domains/domains.csv')   
+
         if self.data.shape[0] == 0: # Adds a blank line to the end of the dataframe if there are no rows
             self.data = self.data.append(pd.Series(), ignore_index=True)
-            self.updateDomainList()
+            
+        self.updateDomainList()
 
         
 
         self.createTableModel()
         
-
+        
         ### Detects when button is clicked and runs inputdomain() ###
         self.addDomain.clicked.connect(self.inputDomain) 
         
 
         ### Syncs domain list to latest version of list ###
         
-        self.syncList.clicked.connect(self.updateDomainList) 
+        #self.syncList.clicked.connect(self.updateDomainList) 
        
 
         ### Starts a manual wpscan of all the websites on the selected day (WIP) ###
         self.initiateManualScan.clicked.connect(self.wpscanManual) 
 
-    def readCsvData(self):
-        return pd.read_csv('../domains/domains.csv')        
+         
 
     def createTableModel(self): ### Creates data model for domain table view ###
         
         ### uses pandas to read he csv file and generate a dataframe/overwrite if re-run ###
         
         
-        print(self.data.head())  
+        print(self.data) 
 
-        model = DomainsTableModel(self.data) # creates te model
+        model = DomainsTableModel(self.data) # creates the model
+        
+
+        ### Sets the model created by the pandasconverter.py ###
+
+        self.domainTableView.setModel(model)
 
         model.dataChanged.connect(self.updateDomainList)
 
-        ### Sets the model created by the pandasconverter.py ###
-        self.domainTableView.setModel(model)
-
         
+        
+
+    #def readCsvData(self): #OLD CODE
+     #   print("read csv")
+      #  return pd.read_csv('../domains/domains.csv')       
 
     def updateDomainList(self): # this is ran when the data in the tabelview changes updating the csv
 
-        
+        print(self.data)
+
         self.data.to_csv("../domains/domains.csv", index=False)
+
+        print("wrote to csv.")
         
 
     def inputDomain(self): # Adds domains to CSV then refreshes table model with newest version
         
-        self.updateDomainList()
-        self.data = DomainInput.input(self, self.domainInput.text(), self.readCsvData())
+        #self.updateDomainList()
+        self.data = DomainInput.input(self, self.domainInput.text(), self.data)
         
         self.createTableModel()
 
@@ -118,13 +128,13 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         with open('../shellScripts/wpwatcher.conf', 'w') as configFile:
             wpConfig.write(configFile)
 
-        #os.chdir("shellScripts")
+        
 
         absoluteConfigPath = os.path.abspath("../shellScripts/wpwatcher.conf")
 
         print(absoluteConfigPath)
-        #os.chdir("wpscanApplication")
-        subprocess.run(['bash', 'shellScripts/wpscan.sh', absoluteConfigPath])
+        
+        subprocess.run(['bash', '../shellScripts/wpscan.sh', absoluteConfigPath])
     
 
 

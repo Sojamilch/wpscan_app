@@ -81,7 +81,7 @@ class DomainInput(): # writes domains into the csv ]
 
         for index in df.index:
 
-            for dayOfWeek in range(0,5):
+            for dayOfWeek in range(0,21):
                 
 
                 #print(df.index, dayOfWeek) # DEBUG PURPOSES
@@ -92,6 +92,7 @@ class DomainInput(): # writes domains into the csv ]
                     if nextCell is None or np.isnan(nextCell) or df.isnull(nextCell) or pd.isna(nextCell): #detects if cell is null value/nothing in cell
                         df.iat[index, dayOfWeek] = domainName #replaces said cell with input domain
                         writeToCv() # saves cv
+                        print(df)
                         return df
                 except: 
                     #print(nextCell, "Is not null/nan") DEBUG PURPOSES
@@ -99,7 +100,7 @@ class DomainInput(): # writes domains into the csv ]
                         print("adding new empty line")
                         df = df.append(pd.Series(), ignore_index=True)
                         writeToCv()
-
+        
         return df
 
                 
