@@ -52,6 +52,14 @@ class DomainInput(): # writes domains into the csv ]
 
     def input(self, domainName, df):
 
+        if domainName == '':
+            error_box = QtWidgets.QErrorMessage()
+            error_box.showMessage("Please input a domain!")
+
+            error_box.exec()
+
+            return df
+
 
         def writeToCv():
             df.to_csv("../domains/domains.csv", index=False)
@@ -72,6 +80,7 @@ class DomainInput(): # writes domains into the csv ]
                         writeToCv() # saves cv
                         print(df)
                         return df
+                    
                 except: 
                     #print(nextCell, "Is not null/nan") DEBUG PURPOSES
                     if nextCell == df.iat[-1,-1]: # if at last value of dataframe add new line to end of dataframe 

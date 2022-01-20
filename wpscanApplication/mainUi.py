@@ -24,10 +24,12 @@ class Ui_MainWindow(object):
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tabWidget.sizePolicy().hasHeightForWidth())
+
         self.tabWidget.setSizePolicy(sizePolicy)
         self.tabWidget.setObjectName("tabWidget")
         self.scanTab = QtWidgets.QWidget()
         self.scanTab.setObjectName("scanTab")
+
         self.initiateManualScan = QtWidgets.QPushButton(self.scanTab)
         self.initiateManualScan.setGeometry(QtCore.QRect(300, 70, 200, 100))
         font = QtGui.QFont()
@@ -35,26 +37,35 @@ class Ui_MainWindow(object):
         self.initiateManualScan.setFont(font)
         self.initiateManualScan.setIconSize(QtCore.QSize(16, 16))
         self.initiateManualScan.setObjectName("initiateManualScan")
+
         self.automationEnable = QtWidgets.QCheckBox(self.scanTab)
         self.automationEnable.setGeometry(QtCore.QRect(350, 220, 101, 23))
         self.automationEnable.setObjectName("automationEnable")
+
         self.scanProgressBar = QtWidgets.QProgressBar(self.scanTab)
         self.scanProgressBar.setGeometry(QtCore.QRect(340, 190, 120, 25))
         self.scanProgressBar.setProperty("value", 0)
         self.scanProgressBar.setObjectName("scanProgressBar")
+
+
         self.tabWidget.addTab(self.scanTab, "")
         self.domainList = QtWidgets.QWidget()
         self.domainList.setObjectName("domainList")
+
         self.domainTableView = QtWidgets.QTableView(self.domainList)
         self.domainTableView.setGeometry(QtCore.QRect(10, 140, 775, 200))
         self.domainTableView.setObjectName("domainTableView")
         self.domainTableView.horizontalHeader().setCascadingSectionResizes(False)
+
         self.domainInput = QtWidgets.QLineEdit(self.domainList)
+        self.domainInput.setPlaceholderText("www.wordpressite.com")
         self.domainInput.setGeometry(QtCore.QRect(10, 30, 270, 25))
         self.domainInput.setObjectName("domainInput")
+
         self.label = QtWidgets.QLabel(self.domainList)
         self.label.setGeometry(QtCore.QRect(10, 10, 91, 17))
         self.label.setObjectName("label")
+
         self.addDomain = QtWidgets.QPushButton(self.domainList)
         self.addDomain.setGeometry(QtCore.QRect(290, 30, 100, 25))
         self.addDomain.setObjectName("addDomain")
@@ -116,7 +127,7 @@ class Ui_MainWindow(object):
         self.initiateManualScan.setText(_translate("MainWindow", "SCAN"))
         self.automationEnable.setText(_translate("MainWindow", "Automate?"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.scanTab), _translate("MainWindow", "Scan"))
-        self.domainInput.setText(_translate("MainWindow", "www.wordpressite.com"))
+        #self.domainInput.setText(_translate("MainWindow", ''))
         self.label.setText(_translate("MainWindow", "Add Domain"))
         self.addDomain.setText(_translate("MainWindow", "Add domain"))
         self.syncList.setText(_translate("MainWindow", "Sync List"))
