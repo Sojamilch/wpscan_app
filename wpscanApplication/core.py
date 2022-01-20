@@ -92,19 +92,18 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
             domainListData = self.data.loc[:, "monday.3":"friday.3"]
 
 
+
         model = DomainsTableModel(domainListData) # creates the model
         
         ### Sets the model created by the pandasconverter.py ###
 
         self.domainTableView.setModel(model)
-
         
+        header = self.domainTableView.horizontalHeader()
 
+        header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         model.dataChanged.connect(self.updateDomainList)
-
-    #def readCsvData(self): #OLD CODE
-     #   print("read csv")
-      #  return pd.read_csv('../domains/domains.csv')       
+  
 
     def updateDomainList(self): # this is ran when the data in the tabelview changes updating the csv
 
