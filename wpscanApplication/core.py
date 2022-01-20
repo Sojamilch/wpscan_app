@@ -1,6 +1,5 @@
 import configparser
 import os
-from queue import Empty
 import subprocess
 import sys
 from calendar import c, week, weekday
@@ -31,15 +30,19 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
             "Week 3":".2",
             "Week 4":".3"
 
-        }
-        try:
-            self.data = pd.read_csv('../domains/domains.csv')   
-        except:
+        }   
 
+        #Attempts to read the csv
+        try:
+            self.data = pd.read_csv('../domains/domains.csv', dtype=object)   
+        except:
+            # Adds column headers if none detected
             columnHeaders = ["monday","tuesday","wednesday","thursday","friday","monday.1","tuesday.1","wednesday.1","thursday.1","friday.1","monday.2","tuesday.2","wednesday.2","thursday.2","friday.2","monday.3","tuesday.3","wednesday.3","thursday.3","friday.3"]    
             self.data = pd.DataFrame(None, columns=columnHeaders)
 
-        if self.data.shape[0] == 0:
+        # Adds a blank line to the end of the dataframe if there are no rows
+
+        if self.data.shape[0] == 0: 
             self.data = self.data.append(pd.Series(), ignore_index=True)
 
 
@@ -47,11 +50,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
          #   self.data = self.data.append(pd.Series(), ignore_index=True)
             
         self.updateDomainList()
-
-        
-
-        
-        
         
         ### Detects when button is clicked and runs inputdomain() ###
         self.addDomain.clicked.connect(self.inputDomain) 
@@ -77,11 +75,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         ### uses pandas to read he csv file and generate a dataframe/overwrite if re-run ### #
 
-
-        #for i in range(0,5):
-        #    if self.selectDomainWeek.currentText() in self.weekList:
-
-         #       domanListData = self.data.loc[:, self.weekList]
         if self.selectDomainWeek.currentText() == "Week 1":
 
             domainListData = self.data.loc[:, "monday":"friday"]
@@ -104,6 +97,8 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         ### Sets the model created by the pandasconverter.py ###
 
         self.domainTableView.setModel(model)
+
+        
 
         model.dataChanged.connect(self.updateDomainList)
 
@@ -140,10 +135,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         wpConfig.read('../shellScripts/wpwatcher.conf') # reading config
         print(wpConfig['wpwatcher']['wp_sites'])
-
-
-
-
 
         selectedDay = self.selectDay.currentText()
         selectedDay = selectedDay.lower() # for which day to manually scan

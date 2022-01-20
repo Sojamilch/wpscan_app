@@ -12,58 +12,90 @@ from PyQt5.QtSql import *
 
 
 class DomainsTableModel(QAbstractTableModel): # Generates a model for a tableview using pandas dataframes as the data
-    
-
+                                                # borrowed from martin fitzpatrick @ https://www.pythonguis.com/faq/editing-pyqt-tableview/
     def __init__(self, data):
-        QAbstractTableModel.__init__(self)
-        
+        super().__init__()
         self._data = data
-        
-    def rowCount(self, parent=None):
+
+    def rowCount(self, index):
         return self._data.shape[0]
 
-    def columnCount(self, parent=None):
+    def columnCount(self, parnet=None):
         return self._data.shape[1]
-    
+
     def data(self, index, role=Qt.DisplayRole):
         if index.isValid():
-            if role == Qt.DisplayRole:
-                return str(self._data.iloc[index.row(), index.column()])
-        return None
+            if role == Qt.DisplayRole or role == Qt.EditRole:
+                value = self._data.iloc[index.row(), index.column()]
+                return str(value)
+
+    def setData(self, index, value, role):
+        if role == Qt.EditRole:
+            self._data.iloc[index.row(), index.column()] = value
+            self.dataChanged.emit(index, index) # allows detection of changes in tableviewdata
+            return True
+        return False
 
     def headerData(self, col, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return self._data.columns[col]
-        return None
-
-    def setData(self, index, value, role):
-
-        if not index.isValid():
-            return False
-
-        if role != QtCore.Qt.EditRole:
-            return False
-
-        row = index.row()
-
-        if row < 0 or row >= len(self._data.values):
-            return False
-
-        column = index.column()
-
-        if column < 0 or column >= self._data.columns.size:
-            return False
-
-        self._data.values[row][column] = value
-        self.dataChanged.emit(index, index) # allows detection of changes in tableviewdata 
-        return True
 
     def flags(self, index):
-        flags = super(self.__class__,self).flags(index)
-        flags |= QtCore.Qt.ItemIsEditable
-        flags |= QtCore.Qt.ItemIsSelectable
-        flags |= QtCore.Qt.ItemIsEnabled
-        return flags
+        return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
+
+ #   def __init__(self, data):
+ #       QAbstractTableModel.__init__(self)
+ #       
+ #       self._data = data
+ #       
+ #   def rowCount(self, parent=None):
+ #       return self._data.shape[0]
+#
+ #   def columnCount(self, parent=None):
+ #       return self._data.shape[1]
+ #   
+ #   def data(self, index, role=Qt.DisplayRole):
+ #       if index.isValid():
+ #           if role == Qt.DisplayRole:
+ #               return str(self._data.iloc[index.row(), index.column()])
+ #       return None
+#
+ #   def headerData(self, col, orientation, role):
+ #       if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+ #           return self._data.columns[col]
+ #       return None
+#
+ #   def setData(self, index, value, role):
+#
+ #       if not index.isValid():
+ #           return False
+#
+ #       if role != QtCore.Qt.EditRole:
+ #           return False
+#
+ #       row = index.row()
+#
+ #       if row < 0 or row >= len(self._data.values):
+ #           return False
+#
+ #       column = index.column()
+#
+ #       if column < 0 or column >= self._data.columns.size:
+ #           return False
+#
+ #       #self._data.values[row][column] = value
+#
+ #       self._data.iloc[index.row(), index.column()] = value
+#
+ #       self.dataChanged.emit(index, index) # allows detection of changes in tableviewdata 
+ #       return str(value)
+#
+ #   def flags(self, index):
+ #       flags = super(self.__class__,self).flags(index)
+ #       flags |= QtCore.Qt.ItemIsEditable
+ #       flags |= QtCore.Qt.ItemIsSelectable
+ #       flags |= QtCore.Qt.ItemIsEnabled
+ #       return flags
     
 
 
