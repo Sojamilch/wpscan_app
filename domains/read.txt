@@ -1,0 +1,3 @@
+it will automtically create a 'domains.csv' in this folder
+
+Added because git commit is being mean and doesn't want to have empty folders in the repository.
