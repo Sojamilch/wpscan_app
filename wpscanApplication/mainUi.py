@@ -102,9 +102,11 @@ class Ui_MainWindow(object):
         self.selectDomainWeek.addItem("Week 4")
 
         self.tabWidget.addTab(self.domainList, "")
-        self.tab = QtWidgets.QWidget()
-        self.tab.setObjectName("tab")
-        self.tabWidget.addTab(self.tab, "")
+        self.schedule = QtWidgets.QWidget()
+        self.schedule.setObjectName("schedule")
+
+    
+        self.tabWidget.addTab(self.schedule, "")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 400, 22))
@@ -133,7 +135,7 @@ class Ui_MainWindow(object):
         self.syncList.setText(_translate("MainWindow", "Sync List"))
         
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.domainList), _translate("MainWindow", "Domains"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Schedule"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.schedule), _translate("MainWindow", "Schedule"))
         self.menuWordPress_Scan.setTitle(_translate("MainWindow", "WordPress Scanner"))
 
 
