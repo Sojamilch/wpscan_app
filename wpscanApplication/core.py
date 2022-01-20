@@ -1,5 +1,6 @@
 import configparser
 import os
+from queue import Empty
 import subprocess
 import sys
 from calendar import c, week, weekday
@@ -31,10 +32,19 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
             "Week 4":".3"
 
         }
-        self.data = pd.read_csv('../domains/domains.csv')   
+        try:
+            self.data = pd.read_csv('../domains/domains.csv')   
+        except:
 
-        if self.data.shape[0] == 0: # Adds a blank line to the end of the dataframe if there are no rows
+            columnHeaders = ["monday","tuesday","wednesday","thursday","friday","monday.1","tuesday.1","wednesday.1","thursday.1","friday.1","monday.2","tuesday.2","wednesday.2","thursday.2","friday.2","monday.3","tuesday.3","wednesday.3","thursday.3","friday.3"]    
+            self.data = pd.DataFrame(None, columns=columnHeaders)
+
+        if self.data.shape[0] == 0:
             self.data = self.data.append(pd.Series(), ignore_index=True)
+
+
+        #if self.data.shape[0] == 0: # Adds a blank line to the end of the dataframe if there are no rows
+         #   self.data = self.data.append(pd.Series(), ignore_index=True)
             
         self.updateDomainList()
 
@@ -68,10 +78,10 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         ### uses pandas to read he csv file and generate a dataframe/overwrite if re-run ### #
 
 
-        for i in range(0,5):
-            if self.selectDomainWeek.currentText() in self.weekList:
+        #for i in range(0,5):
+        #    if self.selectDomainWeek.currentText() in self.weekList:
 
-                domanListData = self.data.loc[:, self.weekList]
+         #       domanListData = self.data.loc[:, self.weekList]
         if self.selectDomainWeek.currentText() == "Week 1":
 
             domainListData = self.data.loc[:, "monday":"friday"]
