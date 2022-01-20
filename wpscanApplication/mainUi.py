@@ -58,7 +58,7 @@ class Ui_MainWindow(object):
         self.domainTableView.horizontalHeader().setCascadingSectionResizes(False)
 
         self.domainInput = QtWidgets.QLineEdit(self.domainList)
-        self.domainInput.setPlaceholderText("www.wordpressite.com")
+        self.domainInput.setPlaceholderText("https://www.wordpressite.com")
         self.domainInput.setGeometry(QtCore.QRect(10, 30, 270, 25))
         self.domainInput.setObjectName("domainInput")
 
