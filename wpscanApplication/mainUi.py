@@ -10,6 +10,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import (QFormLayout, QGroupBox, QHBoxLayout)
 
 
 class Ui_MainWindow(object):
@@ -81,7 +82,7 @@ class Ui_MainWindow(object):
         self.selectWeek.addItem("Week 2")
         self.selectWeek.addItem("Week 3")
         self.selectWeek.addItem("Week 4")
-        self.selectWeek.addItem("All")
+    
 
         self.selectDay = QtWidgets.QComboBox(self.scanTab) # scantab day selection 
         self.selectDay.setGeometry(QtCore.QRect(300, 300, 200, 26))
@@ -91,7 +92,7 @@ class Ui_MainWindow(object):
         self.selectDay.addItem("Wednesday")
         self.selectDay.addItem("Thursday")
         self.selectDay.addItem("Friday")
-        self.selectDay.addItem("All")
+    
 
         self.selectDomainWeek = QtWidgets.QComboBox(self.domainList) # domain list viewing
         self.selectDomainWeek.setGeometry(QtCore.QRect(10, 110, 100, 25))
@@ -102,12 +103,64 @@ class Ui_MainWindow(object):
         self.selectDomainWeek.addItem("Week 4")
 
         self.tabWidget.addTab(self.domainList, "")
-        self.schedule = QtWidgets.QWidget()
-        self.schedule.setObjectName("schedule")
+        self.optionsPage = QtWidgets.QWidget()
+        self.optionsPage.setObjectName("optionsPage")
 
     
-        self.tabWidget.addTab(self.schedule, "")
+        self.tabWidget.addTab(self.optionsPage, "")
         MainWindow.setCentralWidget(self.centralwidget)
+
+        
+
+        self.week1=QtWidgets.QCheckBox()
+        self.week2=QtWidgets.QCheckBox()
+        self.week3=QtWidgets.QCheckBox()
+        self.week4=QtWidgets.QCheckBox()
+
+        for i in range(0,4):
+            weeks = [self.week1,self.week2,self.week3,self.week4]
+            weeks[i].setChecked(True)
+            weeks[i].setStyleSheet("""
+            QCheckBox::Indicator {
+                width: 25px;
+                height: 25px;
+            }
+            """)
+
+        
+
+
+        self.weekForm = QtWidgets.QGroupBox("Week Selector",self.optionsPage) # Decide what weeks should be run 
+        layout = QtWidgets.QFormLayout(self.optionsPage)
+        layout.addRow(QtWidgets.QLabel("Week 1:   "), self.week1)
+        layout.addRow(QtWidgets.QLabel("Week 2:   "), self.week2)
+        layout.addRow(QtWidgets.QLabel("Week 3:   "), self.week3)
+        layout.addRow(QtWidgets.QLabel("Week 4:   "), self.week4)
+        self.weekForm.setLayout(layout)
+
+        
+        self.weekForm.move(600,100)
+
+        self.logBox = QtWidgets.QGroupBox("Console Log",self.optionsPage)
+        consoleBox = QtWidgets.QHBoxLayout(self.optionsPage)
+        self.consoleText = QtWidgets.QTextEdit(self.optionsPage)
+        consoleBox.addWidget(self.consoleText)
+
+        #self.cursor = QtWidgets.QTextCursor(self.consoleText.document())
+        
+
+
+        self.consoleText.setReadOnly(True)
+        self.logBox.setLayout(consoleBox)
+        self.logBox.setGeometry(50,25,500,300)
+
+        
+    
+
+
+
+
+
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 400, 22))
         self.menubar.setObjectName("menubar")
@@ -135,7 +188,7 @@ class Ui_MainWindow(object):
         self.syncList.setText(_translate("MainWindow", "Sync List"))
         
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.domainList), _translate("MainWindow", "Domains"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.schedule), _translate("MainWindow", "Schedule"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.optionsPage), _translate("MainWindow", "Options"))
         self.menuWordPress_Scan.setTitle(_translate("MainWindow", "WordPress Scanner"))
 
 
