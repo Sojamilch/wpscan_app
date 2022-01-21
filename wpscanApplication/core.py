@@ -23,7 +23,10 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
         
+        #self.wpScan = QtCore.QProcess(self)
+        #self.wpScan.setProcessChannelMode(QtCore.QProcess.MergedChannels)
         
+
 
         self.weekList = {
 
@@ -66,6 +69,8 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         ### Starts a manual wpscan of all the websites on the selected day (WIP) ###
         self.initiateManualScan.clicked.connect(self.wpscanManual) 
 
+
+        #self.wpScan.readyRead.connect(self.onReadReady)
          
 
     
@@ -91,7 +96,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         elif self.selectDomainWeek.currentText() == "Week 4":
             
             domainListData = self.data.loc[:, "monday.3":"friday.3"]
-
+        
 
 
         model = DomainsTableModel(domainListData) # creates the model
@@ -138,9 +143,9 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         selectedDay = self.selectDay.currentText()
         selectedDay = selectedDay.lower() # for which day to manually scan
-
-        listOfWebsites = self.data[selectedDay].tolist()
         
+        listOfWebsites = self.data[selectedDay].tolist()
+
         cleanWebsiteList = []
         
         try: # incase website is invalid value it will just ignore it
@@ -167,7 +172,35 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         absoluteConfigPath = os.path.abspath("../shellScripts/wpwatcher.conf") # retrieves path for config location
 
-        subprocess.run(['bash', '../shellScripts/wpscan.sh', absoluteConfigPath]) # executes script
+        self.consoleText.clear()
+
+        
+        #self.wpScan.setArguments([absoluteConfigPath])
+        #self.wpScan.start('../shellScripts/wpwatcher.conf')
+        output = subprocess.Popen(['bash', '../shellScripts/wpscan.sh', absoluteConfigPath], stdout=subprocess.PIPE)
+        
+        while True:
+            line = output.stdout.readline()
+            if not line:
+                break
+            
+            
+            line = line.rstrip()
+            line = line.decode()
+            line += '\n'
+            self.consoleText.append(str(line))
+            #self.cursor.setPosition(-1)
+            #self.consoleText.setTextCursor(self.cursor)
+
+            #self.consoleText.insertPlainText(str(line))
+         # executes script
+        
+
+    #def onReadReady(self):
+    #    output = self.wpScan.readAllStandardOutput().data().decode()
+    #    self.consoleText.append(output)
+
+        #subprocess.run(['bash', '../shellScripts/wpscan.sh', absoluteConfigPath]) # executes script
 
 
 
@@ -179,3 +212,4 @@ if __name__ == '__main__': # Automatically builds the objects when the program i
     win = window()
     win.show()
     sys.exit(app.exec())
+   
