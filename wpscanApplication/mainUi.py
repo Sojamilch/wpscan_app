@@ -43,10 +43,10 @@ class Ui_MainWindow(object):
         self.automationEnable.setGeometry(QtCore.QRect(350, 220, 101, 23))
         self.automationEnable.setObjectName("automationEnable")
 
-        self.scanProgressBar = QtWidgets.QProgressBar(self.scanTab)
-        self.scanProgressBar.setGeometry(QtCore.QRect(340, 190, 120, 25))
-        self.scanProgressBar.setProperty("value", 0)
-        self.scanProgressBar.setObjectName("scanProgressBar")
+#        self.scanProgressBar = QtWidgets.QProgressBar(self.scanTab)
+ #       self.scanProgressBar.setGeometry(QtCore.QRect(340, 190, 120, 25))
+  #      self.scanProgressBar.setProperty("value", 0)
+   #     self.scanProgressBar.setObjectName("scanProgressBar")
 
 
         self.tabWidget.addTab(self.scanTab, "")

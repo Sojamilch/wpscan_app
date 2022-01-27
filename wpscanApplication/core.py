@@ -3,14 +3,15 @@ import os
 import subprocess
 import sys
 from calendar import c, week, weekday
+from time import sleep
 
 import numpy
 import pandas as pd
 import PyQt5
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QProcess, QTimer
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
-                             QTableView, QTableWidgetItem, QStyleFactory)
+                             QStyleFactory, QTableView, QTableWidgetItem)
 from PyQt5.uic import loadUi
 
 from mainUi import Ui_MainWindow
@@ -22,11 +23,9 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        
-        #self.wpScan = QtCore.QProcess(self)
-        #self.wpScan.setProcessChannelMode(QtCore.QProcess.MergedChannels)
-        
 
+
+        self.process = QProcess() #creates thread for scanning
 
         self.weekList = {
 
@@ -49,9 +48,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.data.shape[0] == 0: 
             self.data = self.data.append(pd.Series(), ignore_index=True)
 
-
-        #if self.data.shape[0] == 0: # Adds a blank line to the end of the dataframe if there are no rows
-         #   self.data = self.data.append(pd.Series(), ignore_index=True)
             
         self.updateDomainList()
         
@@ -70,10 +66,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.initiateManualScan.clicked.connect(self.wpscanManual) 
 
 
-        #self.wpScan.readyRead.connect(self.onReadReady)
-         
-
-    
     ### Domain Table View Logic ### 
     
     
@@ -122,19 +114,18 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def inputDomain(self): # Adds domains to CSV then refreshes table model with newest version
         
-        #self.updateDomainList()
+        
         self.data = DomainInput.input(self, self.domainInput.text(), self.data)
         
         self.createTableModel()
 
-      
         
     ### End of domain tableview logic ###
 
 
-
-
     def wpscanManual(self): # Changes the websites that are going to be run in the config, then executest the scan
+        
+        
 
         wpConfig = configparser.ConfigParser()
         
@@ -173,35 +164,28 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         absoluteConfigPath = os.path.abspath("../shellScripts/wpwatcher.conf") # retrieves path for config location
 
         self.consoleText.clear()
-
         
-        #self.wpScan.setArguments([absoluteConfigPath])
-        #self.wpScan.start('../shellScripts/wpwatcher.conf')
-        output = subprocess.Popen(['bash', '../shellScripts/wpscan.sh', absoluteConfigPath], stdout=subprocess.PIPE)
+        self.initiateManualScan.setEnabled(False)
+        self.initiateManualScan.setText("...")
+        self.process.finished.connect(self.process_end)
+        self.process.readyReadStandardOutput.connect(self.wpscanSTDOUT)
+        self.process.start("bash", ['../shellScripts/wpscan.sh', absoluteConfigPath])
         
-        while True:
-            line = output.stdout.readline()
-            if not line:
-                break
-            
-            
-            line = line.rstrip()
-            line = line.decode()
-            line += '\n'
-            self.consoleText.append(str(line))
-            #self.cursor.setPosition(-1)
-            #self.consoleText.setTextCursor(self.cursor)
-
-            #self.consoleText.insertPlainText(str(line))
-         # executes script
+    
+    def wpscanSTDOUT(self): # Reads console output into log
+        output = self.process.readAllStandardOutput()
+        text = bytes(output).decode("utf8")
+        self.consoleText.append(str(text))
+        
         
 
-    #def onReadReady(self):
-    #    output = self.wpScan.readAllStandardOutput().data().decode()
-    #    self.consoleText.append(output)
-
-        #subprocess.run(['bash', '../shellScripts/wpscan.sh', absoluteConfigPath]) # executes script
-
+    def process_end(self): #destroys thread after execution 
+        self.process = None
+        
+        self.initiateManualScan.setText("Done!")
+        QTimer.singleShot(2000, lambda: self.initiateManualScan.setText("SCAN"))
+        self.initiateManualScan.setEnabled(True)
+        
 
 
 if __name__ == '__main__': # Automatically builds the objects when the program is loaded
