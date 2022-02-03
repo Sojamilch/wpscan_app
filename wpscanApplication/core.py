@@ -1,6 +1,7 @@
-from calendar import week
+
 import configparser
 import os
+import datetime
 #import subprocess
 import sys
 #from calendar import c, week, weekday
@@ -16,13 +17,19 @@ from PyQt5.QtCore import QProcess, Qt, QThread, QTimer
 from mainUi import Ui_MainWindow
 from pandascontroller import DomainInput, DomainsTableModel
 
+#TESTING 
+from freezegun import freeze_time
+
+
+
 
 class window(QtWidgets.QMainWindow, Ui_MainWindow):
-    
+    currentDay = 0
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
 
+        window.currentDay = 0 
         #Attempts to read the csv
         try:
             self.data = pd.read_csv('../domains/domains.csv', dtype=object)   
@@ -53,7 +60,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         ### Starts a manual wpscan of all the websites on the selected day (WIP) ###
         self.initiateManualScan.clicked.connect(self.polishedWebList) 
 
-        self.automationEnable.stateChanged.connect()
+        self.automationEnable.stateChanged.connect(self.createThread)
 
     ### Domain Table View Logic ### 
     
@@ -107,28 +114,32 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         
     ### End of domain tableview logic ###
-    def polishedWebList(self, day=None):
+    def polishedWebList(self, day=None, week=None):
         
-        if day != None:
+        if day is None:
             selectedDay = day
+            selectedWeek = week
+            self.currentDay += 1
+            print(self.currentDay)
         else:
             selectedDay = self.selectDay.currentText()
+            selectedWeek = self.selectWeek.currentText()
 
-        if self.selectDomainWeek.currentText() == "Week 1":
+        if selectedWeek == "Week 1":
 
             domainListData = self.data.loc[:, "monday":"friday"]
 
-        elif self.selectDomainWeek.currentText() == "Week 2":
+        elif selectedWeek == "Week 2":
             
             domainListData = self.data.loc[:, "monday.1":"friday.1"]
             selectedDay = selectedDay + ".1"
 
-        elif self.selectDomainWeek.currentText() == "Week 3":
+        elif selectedWeek == "Week 3":
             
             domainListData = self.data.loc[:, "monday.2":"friday.2"]
             selectedDay = selectedDay + ".2"
 
-        elif self.selectDomainWeek.currentText() == "Week 4":
+        elif selectedWeek == "Week 4":
             
             domainListData = self.data.loc[:, "monday.3":"friday.3"]
             selectedDay = selectedDay + ".3"
@@ -188,17 +199,65 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         QTimer.singleShot(2000, lambda: self.initiateManualScan.setText("SCAN"))
         self.initiateManualScan.setEnabled(True)
 
+    def findNextMonday(self):
+        today = datetime.date.today()
+
+        comingMonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
+        
+        print(today)
+        print(comingMonday)
+
+        return comingMonday
+                
+    def createThread(self):
+
+        if self.automationEnable.isChecked():
+            window.currentDay = 0
+            self.thread = WorkerThread()
+            self.thread.start()
+            print("openedThread")
+
+        if self.automationEnable.isChecked() == False:
+            self.thread.exit()
+            print("closed thread")
+
+
+
 class WorkerThread(QThread):
-    def automate(self):
-        if window.enableAutomation.isChecked():
+    @freeze_time("2022-02-14", as_kwarg='test')
+    def run(self, test): 
+        if datetime.date.today() == window.findNextMonday(self) and window.currentDay == 0:
+            print("week 1")
+            schedule.clear()
             for index in range(window.selectedDay.count()):
-                try:
-                    scanWeek = window.selectWeek.itemText(index)
-                except:
-                    pass
                 day = window.selectedDay.itemText(index)
                 day = day.lower()
-                schedule.every().day.do(window.polishedWebList(self,day,scanWeek))
+                schedule.every().day.do(window.polishedWebList(self,day,"Week 1"))
+        
+        elif window.currentDay == 5:
+            print("week 2")
+            schedule.clear()
+            for index in range(window.selectedDay.count()):
+                day = window.selectedDay.itemText(index)
+                day = day.lower()
+                schedule.every().day.do(window.polishedWebList(self,day,"Week 2"))
+
+        elif window.currentDay == 10:
+            schedule.clear()
+            for index in range(window.selectedDay.count()):
+                day = window.selectedDay.itemText(index)
+                day = day.lower()
+                schedule.every().day.do(window.polishedWebList(self,day,"Week 3"))
+
+        elif window.currentDay == 15:
+            schedule.clear()
+            for index in range(window.selectedDay.count()):
+                day = window.selectedDay.itemText(index)
+                day = day.lower()
+                schedule.every().day.do(window.polishedWebList(self,day,"Week 4"))
+
+        
+
     
 if __name__ == '__main__': # Automatically builds the objects when the program is loaded
     
