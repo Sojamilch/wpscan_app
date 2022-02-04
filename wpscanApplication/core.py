@@ -2,6 +2,7 @@
 import configparser
 import os
 import datetime
+from re import S
 #import subprocess
 import sys
 from numpy import diff
@@ -29,6 +30,8 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+
+        self.thread = WorkerThread()
 
         window.currentDay = 0 
         #Attempts to read the csv
@@ -121,7 +124,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
             selectedDay = day
             selectedWeek = week
             self.currentDay += 1
-            print(self.currentDay)
+            print(self.currentDay, "polishing")
         else:
             selectedDay = self.selectDay.currentText()
             selectedWeek = self.selectWeek.currentText()
@@ -200,72 +203,103 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         QTimer.singleShot(2000, lambda: self.initiateManualScan.setText("SCAN"))
         self.initiateManualScan.setEnabled(True)
 
-    def findNextMonday(self):
+    @freeze_time("2022-02-14", as_kwarg='test1')
+    def findNextMonday(self, test1):
         today = datetime.date.today()
+        
         comingMonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
         
         difference = comingMonday - today
 
         totalSeconds = difference.total_seconds()
 
-
-        if today.weekday() == 1:
+        print(today)
+        print(today.weekday())
+        if today.weekday() == 0:
+            print(today.weekday())
             return today.weekday()
         else:
             return totalSeconds
-                
+
+   
     def createThread(self):
 
         if self.automationEnable.isChecked():
             window.currentDay = 0
-            self.thread = WorkerThread()
-            self.thread.start()
+            
+            if self.findNextMonday() != 0:
+                print("Its not monday yet", self.findNextMonday())
+                self.thread.start()
+                self.thread.wait(int(self.findNextMonday()*1000))
+            else:
+                self.thread.start()
+
+            print(self.thread.isRunning())
+            
             print("openedThread")
 
         if self.automationEnable.isChecked() == False:
             self.thread.exit()
             print("closed thread")
 
+    def returnSelectedDayCount(self):
+        count = self.selectedDay.count()
+        return count
 
 
 class WorkerThread(QThread):
-    @freeze_time("2022-02-14", as_kwarg='test')
-    def run(self, test): 
-        if window.findNextMonday(win) != 0:
-            print(window.findNextMonday(win))
-            print("its not monday yet", datetime.date.today())
-            window.thread.sleep(window.findNextMonday(win))
-            
-        if window.findNextMonday() == 0:
+
+    def __init__(self):
+        super().__init__()
+
+
+    @freeze_time("2022-02-14", as_kwarg='test3')
+    def run(self, test3): 
+        
+        # if window.findNextMonday(win) != 0:
+        #     print(window.findNextMonday(win))
+        #     print("its not monday yet", datetime.date.today())
+        #     window.thread.sleep(window.findNextMonday(win))
+        #
+         
+        print("executing")
+        if window.findNextMonday(win) == 0:
             print("week 1")
             schedule.clear()
-            for index in range(window.selectedDay.count()):
-                day = window.selectedDay.itemText(index)
-                day = day.lower()
-                schedule.every().day.do(window.polishedWebList(self,day,"Week 1"))
+            # for index in range(win.selectDay.count()):
+            #     day = win.selectDay.itemText(index)
+            #     day = day.lower()
+            #     print(day)
+            #     schedule.every().day.do(window.polishedWebList, win,day,"Week 1")
+            window.polishedWebList(win,"monday","Week 1")
+            schedule.every().tuesday.do(window.polishedWebList, win,"tuesday","Week 1")
+            schedule.every().wednesday.do(window.polishedWebList, win,"wednesday","Week 1")
+            schedule.every().thursday.do(window.polishedWebList, win,"thursday","Week 1")
+            schedule.every().friday.do(window.polishedWebList, win,"friday","Week 1")
+            print(schedule.get_jobs())
         
-        elif window.currentDay == 5:
+        elif win.currentDay == 5:
             print("week 2")
             schedule.clear()
-            for index in range(window.selectedDay.count()):
-                day = window.selectedDay.itemText(index)
+            for index in range(win.selectedDay.count()):
+                day = win.selectedDay.itemText(index)
                 day = day.lower()
-                schedule.every().day.do(window.polishedWebList(self,day,"Week 2"))
+                schedule.every().day.do(window.polishedWebList(win,day,"Week 2"))
 
-        elif window.currentDay == 10:
+
+        elif win.currentDay == 10:
             schedule.clear()
-            for index in range(window.selectedDay.count()):
-                day = window.selectedDay.itemText(index)
+            for index in range(win.selectedDay.count()):
+                day = win.selectedDay.itemText(index)
                 day = day.lower()
-                schedule.every().day.do(window.polishedWebList(self,day,"Week 3"))
+                schedule.every().day.do(window.polishedWebList(win,day,"Week 3"))
 
-        elif window.currentDay == 15:
+        elif win.currentDay == 15:
             schedule.clear()
-            for index in range(window.selectedDay.count()):
-                day = window.selectedDay.itemText(index)
+            for index in range(win.selectedDay.count()):
+                day = win.selectedDay.itemText(index)
                 day = day.lower()
-                schedule.every().day.do(window.polishedWebList(self,day,"Week 4"))
-
+                schedule.every().day.do(window.polishedWebList(win,day,"Week 4"))
         
 
     
