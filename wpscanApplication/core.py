@@ -4,6 +4,7 @@ import os
 import datetime
 #import subprocess
 import sys
+from numpy import diff
 #from calendar import c, week, weekday
 #from time import sleep
 import schedule
@@ -201,13 +202,17 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def findNextMonday(self):
         today = datetime.date.today()
-
         comingMonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
         
-        print(today)
-        print(comingMonday)
+        difference = comingMonday - today
 
-        return comingMonday
+        totalSeconds = difference.total_seconds()
+
+
+        if today.weekday() == 1:
+            return today.weekday()
+        else:
+            return totalSeconds
                 
     def createThread(self):
 
@@ -226,7 +231,12 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 class WorkerThread(QThread):
     @freeze_time("2022-02-14", as_kwarg='test')
     def run(self, test): 
-        if datetime.date.today() == window.findNextMonday(self) and window.currentDay == 0:
+        if window.findNextMonday(win) != 0:
+            print(window.findNextMonday(win))
+            print("its not monday yet", datetime.date.today())
+            window.thread.sleep(window.findNextMonday(win))
+            
+        if window.findNextMonday() == 0:
             print("week 1")
             schedule.clear()
             for index in range(window.selectedDay.count()):
