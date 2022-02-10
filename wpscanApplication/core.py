@@ -27,6 +27,7 @@ from freezegun import freeze_time
 
 class window(QtWidgets.QMainWindow, Ui_MainWindow):
     currentDay = 0
+    
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
@@ -65,6 +66,15 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.initiateManualScan.clicked.connect(self.polishedWebList) 
 
         self.automationEnable.stateChanged.connect(self.createThread)
+  
+        self.thread.startScan.connect(self.polishedWebList)
+
+
+
+
+
+
+
 
     ### Domain Table View Logic ### 
     
@@ -177,11 +187,11 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         with open('../shellScripts/wpwatcher.conf', 'w') as configFile:
             wpConfig.write(configFile)
-
+        print("Finished cleaning")
         self.wpscan()
 
     def wpscan(self): # Changes the websites that are going to be run in the config, then executest the scan
-        
+        print("scanning")
         #writes updated config back to file
         self.process = QProcess() #creates thread for scanning
         absoluteConfigPath = os.path.abspath("../shellScripts/wpwatcher.conf") # retrieves path for config location
@@ -191,6 +201,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.process.finished.connect(self.process_end)
         self.process.readyReadStandardOutput.connect(self.wpscanSTDOUT)
         self.process.start("bash", ['../shellScripts/wpscan.sh', absoluteConfigPath])
+
         
     def wpscanSTDOUT(self): # Reads console output into log
         output = self.process.readAllStandardOutput()
@@ -228,9 +239,11 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
             window.currentDay = 0
             
             if self.findNextMonday() != 0:
-                print("Its not monday yet", self.findNextMonday())
+                secondsRemaining = int((self.findNextMonday()*1000))
+                print("Its not monday yet", secondsRemaining)
                 self.thread.start()
-                self.thread.wait(int(self.findNextMonday()*1000))
+                self.thread.wait(secondsRemaining)
+                self.consoleText.append("Waiting: " + str(secondsRemaining) + " seconds")
             else:
                 self.thread.start()
 
@@ -238,9 +251,9 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
             
             print("openedThread")
 
-        if self.automationEnable.isChecked() == False:
-            self.thread.exit()
-            print("closed thread")
+
+    def killThread(self):
+        self.thread.stop()
 
     def returnSelectedDayCount(self):
         count = self.selectedDay.count()
@@ -249,9 +262,11 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
 class WorkerThread(QThread):
 
+    startScan = QtCore.pyqtSignal(str, str)
+
     def __init__(self):
         super().__init__()
-
+        self.threadactive = True
 
     @freeze_time("2022-02-14", as_kwarg='test3')
     def run(self, test3): 
@@ -266,42 +281,42 @@ class WorkerThread(QThread):
         if window.findNextMonday(win) == 0:
             print("week 1")
             schedule.clear()
-            # for index in range(win.selectDay.count()):
-            #     day = win.selectDay.itemText(index)
-            #     day = day.lower()
-            #     print(day)
-            #     schedule.every().day.do(window.polishedWebList, win,day,"Week 1")
-            window.polishedWebList(win,"monday","Week 1")
-            schedule.every().tuesday.do(window.polishedWebList, win,"tuesday","Week 1")
-            schedule.every().wednesday.do(window.polishedWebList, win,"wednesday","Week 1")
-            schedule.every().thursday.do(window.polishedWebList, win,"thursday","Week 1")
-            schedule.every().friday.do(window.polishedWebList, win,"friday","Week 1")
+
+            #window.polishedWebList(win,"monday","Week 1")
+            self.startScan.emit("monday", "Week 1")
+
+            schedule.every().tuesday.do(self.startScan.emit, "tuesday", "Week 1")
+            schedule.every().wednesday.do(self.startScan.emit, "wednesday", "Week 1")
+            schedule.every().thursday.do(self.startScan.emit, "thursday", "Week 1")
+            schedule.every().friday.do(self.startScan.emit, "friday", "Week 1")
             print(schedule.get_jobs())
         
-        elif win.currentDay == 5:
-            print("week 2")
-            schedule.clear()
-            for index in range(win.selectedDay.count()):
-                day = win.selectedDay.itemText(index)
-                day = day.lower()
-                schedule.every().day.do(window.polishedWebList(win,day,"Week 2"))
+        # elif win.currentDay == 5:
+        #     print("week 2")
+        #     schedule.clear()
+        #     for index in range(win.selectedDay.count()):
+        #         day = win.selectedDay.itemText(index)
+        #         day = day.lower()
+        #         schedule.every().day.do(window.polishedWebList(win,day,"Week 2"))
 
 
-        elif win.currentDay == 10:
-            schedule.clear()
-            for index in range(win.selectedDay.count()):
-                day = win.selectedDay.itemText(index)
-                day = day.lower()
-                schedule.every().day.do(window.polishedWebList(win,day,"Week 3"))
+        # elif win.currentDay == 10:
+        #     schedule.clear()
+        #     for index in range(win.selectedDay.count()):
+        #         day = win.selectedDay.itemText(index)
+        #         day = day.lower()
+        #         schedule.every().day.do(window.polishedWebList(win,day,"Week 3"))
 
-        elif win.currentDay == 15:
-            schedule.clear()
-            for index in range(win.selectedDay.count()):
-                day = win.selectedDay.itemText(index)
-                day = day.lower()
-                schedule.every().day.do(window.polishedWebList(win,day,"Week 4"))
+        # elif win.currentDay == 15:
+        #     schedule.clear()
+        #     for index in range(win.selectedDay.count()):
+        #         day = win.selectedDay.itemText(index)
+        #         day = day.lower()
+        #         schedule.every().day.do(window.polishedWebList(win,day,"Week 4"))
         
-
+    def stop(self):
+        self.threadactive = False
+        self.wait()
     
 if __name__ == '__main__': # Automatically builds the objects when the program is loaded
     
