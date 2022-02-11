@@ -239,14 +239,10 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     ### End of domain tableview logic ###
     def polishedWebList(self, day=None, week=None):
         
-        if day is None:
+        if day is not None:
             selectedDay = day
             selectedWeek = week
-            #self.worker.updateCurrentDay.emit(1)
-
-            print("polishing")
         else:
-            print("polishing")
             selectedDay = self.selectDay.currentText()
             selectedWeek = self.selectWeek.currentText()
 
@@ -340,17 +336,10 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.process.kill()
             self.consoleText.append("Process Killed mid execution....")
-            # self.worker.deleteLater()
-            # self.worker = worker()
-            # self.worker.moveToThread(thread)
-            #self.process = QProcess()
             print(self.worker.thread())
             print("Deleted Worker - re-created worker")
 
-    # def isDestroyed(self):
-    #     print("worker was deleted")
-    #     self.worker = worker()
-    #     self.worker.moveToThread(thread)
+
     
 if __name__ == '__main__': # Automatically builds the objects when the program is loaded
     

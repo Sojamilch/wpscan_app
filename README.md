@@ -16,5 +16,14 @@ dependencies:
 - numpy 
 - wpwatcher/wpscan API  
 
+Planned Features:
+- Warn user of killing process (Are you sure button0
+- Notify user that automation is in progress 
+    - When next scan is due
+- Chose if you wish to skip this weeks scans
+- Enable/Disable weeks to scan
+- MCS logo 
+
+
 
 *Vielen Dank*
