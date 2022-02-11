@@ -3,21 +3,14 @@ import configparser
 import os
 import datetime
 from re import S
-#import subprocess
 import sys
 from tkinter.tix import Tree
 from numpy import diff
 from pyrsistent import s
-#from calendar import c, week, weekday
-#from time import sleep
 import schedule
 import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QProcess, Qt, QThread, QTimer
-#from PyQt5.QtWidgets import (QApplication, QMainWindow, QMessageBox,
-#                             QStyleFactory, QTableView, QTableWidgetItem)
-#from PyQt5.uic import loadUi
-
 from mainUi import Ui_MainWindow
 from pandascontroller import DomainInput, DomainsTableModel
 
@@ -50,12 +43,6 @@ class worker(QtCore.QObject): # Worker object for auto scan
     @freeze_time("2022-02-14", as_kwarg='test3')
     def automateScan(self, test3): 
         
-        # if window.findNextMonday(win) != 0:
-        #     print(window.findNextMonday(win))
-        #     print("its not monday yet", datetime.date.today())
-        #     window.thread.sleep(window.findNextMonday(win))
-        #
-         
         print("executing")
         if self.findNextMonday() == 0 and self.currentDay == 0:
             print("week 1")
@@ -183,7 +170,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.process.finished.connect(self.process_end)
 
-#        self.destroyed.connect(self.isDestroyed)
+        
 
     ### Domain Table View Logic ### 
     
@@ -219,14 +206,8 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
         model.dataChanged.connect(self.updateDomainList)
   
-
     def updateDomainList(self): # this is ran when the data in the tabelview changes updating the csv
-
-        #print(self.data)
-
         self.data.to_csv("../domains/domains.csv", index=False)
-
-        #print("wrote to csv.")
         
 
     def inputDomain(self): # Adds domains to CSV then refreshes table model with newest version
@@ -239,10 +220,14 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     ### End of domain tableview logic ###
     def polishedWebList(self, day=None, week=None):
         
-        if day is not None:
+        print(day,week) 
+
+        if week != None:
             selectedDay = day
             selectedWeek = week
-        else:
+            print("polish1")
+        elif week == None:
+            print("polasi 2")
             selectedDay = self.selectDay.currentText()
             selectedWeek = self.selectWeek.currentText()
 
@@ -268,7 +253,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         wpConfig = configparser.ConfigParser()
         
         wpConfig.read('../shellScripts/wpwatcher.conf') # reading config
-        #print(wpConfig['wpwatcher']['wp_sites'])
+       
 
         selectedDay = selectedDay.lower()
         listOfWebsites = domainListData[selectedDay].tolist()
@@ -287,10 +272,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         #formatting list to match original reuqirements 
         cleanWebsiteList = ' , '.join(cleanWebsiteList) 
-        #print(cleanWebsiteList)
         wpConfig['wpwatcher']['wp_sites'] = "[" + cleanWebsiteList + "]"
-
-        #print(wpConfig['wpwatcher']['wp_sites'])
 
         with open('../shellScripts/wpwatcher.conf', 'w') as configFile:
             wpConfig.write(configFile)
@@ -315,7 +297,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
     def process_end(self): #destroys process after execution and changes button text
         print("Finsihed...")
-        #self.process = None
         self.initiateManualScan.setText("Done!")
         QTimer.singleShot(2000, lambda: self.initiateManualScan.setText("SCAN"))
         self.initiateManualScan.setEnabled(True)
@@ -326,12 +307,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def isChecked(self):
         
         if self.automationEnable.isChecked() and self.initiateManualScan.isEnabled():
-            try:
-                #self.worker = worker()
-                #self.worker.moveToThread(thread)
-                print("created worker")
-            except:
-                pass
             self.worker.confAutomation()
         else:
             self.process.kill()
@@ -340,13 +315,24 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
             print("Deleted Worker - re-created worker")
 
 
-    
+    def closeEvent(self, event): # Warns user when trying to close program
+        questionBox = QtWidgets.QMessageBox
+
+        if self.automationEnable.isChecked() or self.process.state() == 2 or schedule.get_jobs():
+            answer = questionBox.question(self, '', "Are you sure you want to close? \n You will cancel the current schedule!", questionBox.Yes | questionBox.No)
+
+        if answer == questionBox.Yes:
+         
+            event.accept()
+        else:
+
+            event.ignore()
+
+
 if __name__ == '__main__': # Automatically builds the objects when the program is loaded
     
-    
     app = QtWidgets.QApplication(sys.argv)
-
     win = window()
     win.show()
-    sys.exit(app.exec())
+    app.exec()
    
