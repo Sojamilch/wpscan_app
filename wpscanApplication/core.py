@@ -1,12 +1,10 @@
-
 import configparser
 import os
+from os.path import exists
 import datetime
 from re import S
 import sys
-from tkinter.tix import Tree
 from numpy import diff
-from pyrsistent import s
 import schedule
 import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -24,11 +22,13 @@ class worker(QtCore.QObject): # Worker object for auto scan
     updateConsole = QtCore.pyqtSignal(str)
     updateCurrentDay = QtCore.pyqtSignal(int)
     autoCheck = QtCore.pyqtSignal(bool)
+    
 
     def __init__(self, parent=None):
         super(worker, self).__init__(parent)
         self.currentDay = 0
         self.updateCurrentDay.connect(self.updateDay)
+      
         
         
     def updateDay(self):
@@ -38,7 +38,10 @@ class worker(QtCore.QObject): # Worker object for auto scan
         print(self.check)
         self.check = tick
         return self.check
-        
+    
+    def clearSchedule(self):
+        print("cleared")
+        schedule.clear()
 
     @freeze_time("2022-02-14", as_kwarg='test3')
     def automateScan(self, test3): 
@@ -126,7 +129,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         thread = QtCore.QThread(self)
         thread.start()
 
- 
         self.worker = worker()
         self.worker.moveToThread(thread)
         print(self.worker.thread())
@@ -145,7 +147,10 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.data.shape[0] == 0: 
             self.data = self.data.append(pd.Series(), ignore_index=True)
 
-            
+        
+
+      
+       
         self.updateDomainList()
         
         ### Detects when button is clicked and runs inputdomain() ###
@@ -158,7 +163,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         #self.syncList.clicked.connect(self.updateDomainList) 
        
-
         ### Starts a manual wpscan of all the websites on the selected day (WIP) ###
         self.initiateManualScan.clicked.connect(self.polishedWebList) 
 
@@ -170,6 +174,12 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.process.finished.connect(self.process_end)
 
+        
+
+        #Saves config options
+        self.saveOptions.clicked.connect(self.saveConfig)
+
+        QTimer.singleShot(1, self.firstTimeSetup)
         
 
     ### Domain Table View Logic ### 
@@ -252,12 +262,13 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
             
         wpConfig = configparser.ConfigParser()
         
-        wpConfig.read('../shellScripts/wpwatcher.conf') # reading config
-       
+
+
+
 
         selectedDay = selectedDay.lower()
         listOfWebsites = domainListData[selectedDay].tolist()
-        print(selectedDay, listOfWebsites)
+        #print(selectedDay, listOfWebsites)
 
         cleanWebsiteList = []
         
@@ -272,11 +283,13 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         #formatting list to match original reuqirements 
         cleanWebsiteList = ' , '.join(cleanWebsiteList) 
+        
+        wpConfig.read('../shellScripts/wpwatcher.conf') # reading config
         wpConfig['wpwatcher']['wp_sites'] = "[" + cleanWebsiteList + "]"
-
+        
         with open('../shellScripts/wpwatcher.conf', 'w') as configFile:
             wpConfig.write(configFile)
-        print("Finished cleaning")
+
         self.wpscan()
 
     def wpscan(self): # Changes the websites that are going to be run in the config, then executest the scan
@@ -285,6 +298,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         absoluteConfigPath = os.path.abspath("../shellScripts/wpwatcher.conf") # retrieves path for config location
         self.consoleText.clear()
         self.initiateManualScan.setEnabled(False)
+        self.automationEnable.setEnabled(False)
         self.initiateManualScan.setText("...")
         self.process.readyReadStandardOutput.connect(self.wpscanSTDOUT)
         self.process.start("bash", ['../shellScripts/wpscan.sh', absoluteConfigPath])
@@ -300,6 +314,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.initiateManualScan.setText("Done!")
         QTimer.singleShot(2000, lambda: self.initiateManualScan.setText("SCAN"))
         self.initiateManualScan.setEnabled(True)
+        self.automationEnable.setEnabled(True)
      
     def timeReminaing(self, text):
         self.consoleText.append(str(text))
@@ -308,7 +323,9 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         if self.automationEnable.isChecked() and self.initiateManualScan.isEnabled():
             self.worker.confAutomation()
+            
         else:
+            self.worker.clearSchedule()
             self.process.kill()
             self.consoleText.append("Process Killed mid execution....")
             print(self.worker.thread())
@@ -321,12 +338,59 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.automationEnable.isChecked() or self.process.state() == 2 or schedule.get_jobs():
             answer = questionBox.question(self, '', "Are you sure you want to close? \n You will cancel the current schedule!", questionBox.Yes | questionBox.No)
 
+        test = schedule.get_jobs()
         if answer == questionBox.Yes:
          
             event.accept()
         else:
 
             event.ignore()
+
+    def firstTimeSetup(self): #Ask for setup on first time running
+        if not exists("../shellScripts/wpwatcher.conf"):
+            os.system("wpwatcher --template_conf > ../shellScripts/wpwatcher.conf")
+            fileCheck = QtWidgets.QMessageBox()
+            answer = fileCheck.question(self,"Setup","Please configure the scanner to continue...", fileCheck.Yes | fileCheck.No)
+
+            if answer == fileCheck.Yes:
+                self.tabWidget.setCurrentIndex(3)
+            else:
+                pass
+        
+        #reads config file to options Page
+        reader = configparser.ConfigParser()
+        reader.read('../shellScripts/wpwatcher.conf')
+        emailAdress = reader["wpwatcher"]["email_to"]
+        emailAdress = emailAdress.strip('["]')
+        self.emailTo.setText(emailAdress) 
+        self.emailFrom.setText(reader["wpwatcher"]["from_email"])
+        self.smtpServer.setText(reader["wpwatcher"]["smtp_server"])
+        self.passwordBox.setText(reader["wpwatcher"]["smtp_pass"])
+        if reader["wpwatcher"]["send_email_report"] == "Yes":
+            self.emailReport.setChecked(True)
+        else:
+            self.emailReport.setChecked(False)  
+
+    def saveConfig(self):
+        config = configparser.ConfigParser()
+
+        config.read('../shellScripts/wpwatcher.conf') # reading config
+        if self.emailReport.isChecked():
+            config["wpwatcher"]["send_email_report"] = "Yes"
+        else:
+            config["wpwatcher"]["send_email_report"] = "No"
+        
+        config["wpwatcher"]["email_to"] = '["' + self.emailTo.text() + '"]'
+        config["wpwatcher"]["from_email"] = self.emailFrom.text()
+        config["wpwatcher"]["smtp_server"] = self.smtpServer.text()
+        config["wpwatcher"]["smtp_user"] = self.smtpServer.text()
+        config["wpwatcher"]["smtp_pass"] = self.passwordBox.text()
+
+        with open('../shellScripts/wpwatcher.conf', 'w') as configFile:
+            config.write(configFile)
+
+        saveComplete = QtWidgets.QMessageBox()
+        saveComplete.about(self,"Success!","Options saved to wpwatcher.conf!")
 
 
 if __name__ == '__main__': # Automatically builds the objects when the program is loaded
