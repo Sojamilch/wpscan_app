@@ -103,47 +103,30 @@ class Ui_MainWindow(object):
         self.selectDomainWeek.addItem("Week 4")
 
         self.tabWidget.addTab(self.domainList, "")
-        self.optionsPage = QtWidgets.QWidget()
-        self.optionsPage.setObjectName("optionsPage")
 
-    
-        self.tabWidget.addTab(self.optionsPage, "")
+        self.logPage = QtWidgets.QWidget()
+        self.logPage.setObjectName("logPage")
+
+        self.tabWidget.addTab(self.logPage, "")
         MainWindow.setCentralWidget(self.centralwidget)
 
-        
 
-        self.week1=QtWidgets.QCheckBox()
-        self.week2=QtWidgets.QCheckBox()
-        self.week3=QtWidgets.QCheckBox()
-        self.week4=QtWidgets.QCheckBox()
 
-        for i in range(0,4):
-            weeks = [self.week1,self.week2,self.week3,self.week4]
-            weeks[i].setChecked(True)
-            weeks[i].setStyleSheet("""
-            QCheckBox::Indicator {
-                width: 25px;
-                height: 25px;
-            }
-            """)
+        # for i in range(0,4):
+        #     weeks = [self.week1,self.week2,self.week3,self.week4]
+        #     weeks[i].setChecked(True)
+        #     weeks[i].setStyleSheet("""
+        #     QCheckBox::Indicator {
+        #         width: 25px;
+        #         height: 25px;
+        #     }
+        #     """)
 
         
 
-
-        self.weekForm = QtWidgets.QGroupBox("Week Selector",self.optionsPage) # Decide what weeks should be run 
-        layout = QtWidgets.QFormLayout(self.optionsPage)
-        layout.addRow(QtWidgets.QLabel("Week 1:   "), self.week1)
-        layout.addRow(QtWidgets.QLabel("Week 2:   "), self.week2)
-        layout.addRow(QtWidgets.QLabel("Week 3:   "), self.week3)
-        layout.addRow(QtWidgets.QLabel("Week 4:   "), self.week4)
-        self.weekForm.setLayout(layout)
-
-        
-        self.weekForm.move(600,100)
-
-        self.logBox = QtWidgets.QGroupBox("Console Log",self.optionsPage)
-        consoleBox = QtWidgets.QHBoxLayout(self.optionsPage)
-        self.consoleText = QtWidgets.QTextEdit(self.optionsPage)
+        self.logBox = QtWidgets.QGroupBox("Console Log",self.logPage)
+        consoleBox = QtWidgets.QHBoxLayout(self.logPage)
+        self.consoleText = QtWidgets.QTextEdit(self.logPage)
         consoleBox.addWidget(self.consoleText)
 
         #self.cursor = QtWidgets.QTextCursor(self.consoleText.document())
@@ -152,14 +135,47 @@ class Ui_MainWindow(object):
 
         self.consoleText.setReadOnly(True)
         self.logBox.setLayout(consoleBox)
-        self.logBox.setGeometry(50,25,500,300)
+        self.logBox.setGeometry(0,10,790,300)
 
         
     
+        #Options Page for config
+        self.optionsPage = QtWidgets.QWidget()
+        self.optionsPage.setObjectName("optionsPage")
+        self.tabWidget.addTab(self.optionsPage, "")
 
+        self.optionsBox = QtWidgets.QVBoxLayout(self.optionsPage)
 
+        self.passwordBox = QtWidgets.QLineEdit()
+        self.passwordBox.setEchoMode(QtWidgets.QLineEdit.Password)
 
+        self.emailReport = QtWidgets.QCheckBox()
 
+        self.emailTo = QtWidgets.QLineEdit()
+
+        self.emailFrom = QtWidgets.QLineEdit()
+
+        self.smtpServer = QtWidgets.QLineEdit()
+
+        self.saveOptions = QtWidgets.QPushButton()
+        self.saveOptions.setFixedSize(QtCore.QSize(100,25))
+
+        self.configForm = QGroupBox("Options", self.optionsPage)
+        layout = QFormLayout()
+        layout.addRow(QtWidgets.QLabel("Send Email Report?"), self.emailReport)
+        layout.addRow(QtWidgets.QLabel("Email to:"), self.emailTo)
+        layout.addRow(QtWidgets.QLabel("Email from:"), self.emailFrom)
+        layout.addRow(QtWidgets.QLabel("SMTP Server: "), self.smtpServer)
+        layout.addRow(QtWidgets.QLabel("Sender Password"), self.passwordBox)
+        layout.addRow(self.saveOptions)
+        
+
+        self.configForm.setLayout(layout)
+        
+
+        self.optionsBox.addWidget(self.configForm)
+        
+        self.optionsBox.setGeometry(QtCore.QRect(50,25,100,100))
 
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 400, 22))
@@ -170,10 +186,9 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -186,8 +201,10 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "Add Domain"))
         self.addDomain.setText(_translate("MainWindow", "Add domain"))
         self.syncList.setText(_translate("MainWindow", "Sync List"))
+        self.saveOptions.setText(_translate("MainWindow", "Save Options"))
         
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.domainList), _translate("MainWindow", "Domains"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.logPage), _translate("MainWindow", "Log"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.optionsPage), _translate("MainWindow", "Options"))
         self.menuWordPress_Scan.setTitle(_translate("MainWindow", "WordPress Scanner"))
 
