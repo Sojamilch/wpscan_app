@@ -157,6 +157,8 @@ class Ui_MainWindow(object):
 
         self.smtpServer = QtWidgets.QLineEdit()
 
+        self.apiKeyBox = QtWidgets.QLineEdit()
+
         self.saveOptions = QtWidgets.QPushButton()
         self.saveOptions.setFixedSize(QtCore.QSize(100,25))
 
@@ -166,7 +168,8 @@ class Ui_MainWindow(object):
         layout.addRow(QtWidgets.QLabel("Email to:"), self.emailTo)
         layout.addRow(QtWidgets.QLabel("Email from:"), self.emailFrom)
         layout.addRow(QtWidgets.QLabel("SMTP Server: "), self.smtpServer)
-        layout.addRow(QtWidgets.QLabel("Sender Password"), self.passwordBox)
+        layout.addRow(QtWidgets.QLabel("Sender Password: "), self.passwordBox)
+        layout.addRow(QtWidgets.QLabel("WPSCAN API Key: "), self.apiKeyBox)
         layout.addRow(self.saveOptions)
         
 

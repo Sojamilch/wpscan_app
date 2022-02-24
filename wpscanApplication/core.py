@@ -50,8 +50,6 @@ class worker(QtCore.QObject): # Worker object for auto scan
         if self.findNextMonday() == 0 and self.currentDay == 0:
             print("week 1")
             schedule.clear()
-
-            #window.polishedWebList(win,"monday","Week 1")
             self.startScan.emit("monday", "Week 1")
             schedule.every().tuesday.do(self.startScan.emit, "tuesday", "Week 1")
             schedule.every().wednesday.do(self.startScan.emit, "wednesday", "Week 1")
@@ -59,6 +57,7 @@ class worker(QtCore.QObject): # Worker object for auto scan
             schedule.every().friday.do(self.startScan.emit, "friday", "Week 1")
 
         elif self.currentDay == 5:
+            print("week 2")
             schedule.clear()
             self.startScan.emit("monday", "Week 2")
             schedule.every().tuesday.do(self.startScan.emit, "tuesday", "Week 2")
@@ -91,8 +90,7 @@ class worker(QtCore.QObject): # Worker object for auto scan
 
         totalSeconds = difference.total_seconds()
 
-        print(today)
-        print(today.weekday())
+      
         if today.weekday() == 0:
             print(today.weekday())
             return today.weekday()
@@ -174,7 +172,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.process.finished.connect(self.process_end)
 
-        
+
 
         #Saves config options
         self.saveOptions.clicked.connect(self.saveConfig)
@@ -380,11 +378,14 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             config["wpwatcher"]["send_email_report"] = "No"
         
+        apiKeyFormatted = '[ "--random-user-agent", "--api-token", "'  + self.apiKeyBox.text() + '"]'
+
         config["wpwatcher"]["email_to"] = '["' + self.emailTo.text() + '"]'
         config["wpwatcher"]["from_email"] = self.emailFrom.text()
         config["wpwatcher"]["smtp_server"] = self.smtpServer.text()
         config["wpwatcher"]["smtp_user"] = self.smtpServer.text()
         config["wpwatcher"]["smtp_pass"] = self.passwordBox.text()
+        config["wpwatcher"]["wpscan_args"] = apiKeyFormatted
 
         with open('../shellScripts/wpwatcher.conf', 'w') as configFile:
             config.write(configFile)
