@@ -212,6 +212,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         header = self.domainTableView.horizontalHeader()
 
         header.setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.domainTableView.resizeColumnsToContents()
         model.dataChanged.connect(self.updateDomainList)
   
     def updateDomainList(self): # this is ran when the data in the tabelview changes updating the csv

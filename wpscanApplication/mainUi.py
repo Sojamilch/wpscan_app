@@ -57,6 +57,7 @@ class Ui_MainWindow(object):
         self.domainTableView.setGeometry(QtCore.QRect(10, 140, 775, 200))
         self.domainTableView.setObjectName("domainTableView")
         self.domainTableView.horizontalHeader().setCascadingSectionResizes(False)
+        self.domainTableView.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
 
         self.domainInput = QtWidgets.QLineEdit(self.domainList)
         self.domainInput.setPlaceholderText("https://www.wordpressite.com")
@@ -124,7 +125,7 @@ class Ui_MainWindow(object):
 
         
 
-        self.logBox = QtWidgets.QGroupBox("Console Log",self.logPage)
+        self.logBox = QtWidgets.QGroupBox("Scan Log",self.logPage)
         consoleBox = QtWidgets.QHBoxLayout(self.logPage)
         self.consoleText = QtWidgets.QTextEdit(self.logPage)
         consoleBox.addWidget(self.consoleText)
