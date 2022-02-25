@@ -2,7 +2,7 @@
 
 ==============================================
 
-A very basic app written in python that *should* produce and send a report of vunerabilities detected within the specified websites utilisng the WPScan API [WPScan Github Repo](https://github.com/wpscanteam/wpscan). This is my first *"major"* programming project.
+A very basic app written in python that *should* produce and send a report of vunerabilities detected within the specified websites utilisng the WPScan API [WPScan Github Repo](https://github.com/wpscanteam/wpscan). This is my first somewhat real programming project.
 
 This app was designed to the specification and needs of MCS Computer Support in Yeovil
 
@@ -17,11 +17,9 @@ dependencies:
 - wpwatcher/wpscan API  
 
 Planned Features:
-- Warn user of killing process (Are you sure button0
+- ~~Warn user of killing process (Are you sure button)~~
 - Notify user that automation is in progress 
     - When next scan is due
-- Chose if you wish to skip this weeks scans
-- Enable/Disable weeks to scan
 - MCS logo 
 
 

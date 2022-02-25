@@ -35,12 +35,12 @@ class worker(QtCore.QObject): # Worker object for auto scan
         self.currentDay += 1
     
     def automationCheck(self, tick):
-        print(self.check)
+        #print(self.check)
         self.check = tick
         return self.check
     
     def clearSchedule(self):
-        print("cleared")
+        #print("cleared")
         schedule.clear()
 
     @freeze_time("2022-02-14", as_kwarg='test3')
@@ -81,7 +81,7 @@ class worker(QtCore.QObject): # Worker object for auto scan
 
     @freeze_time("2022-02-14", as_kwarg='test1')
     def findNextMonday(self, test1):
-        print("finding date")
+        #print("finding date")
         today = datetime.date.today()
         
         comingMonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
@@ -92,14 +92,14 @@ class worker(QtCore.QObject): # Worker object for auto scan
 
       
         if today.weekday() == 0:
-            print(today.weekday())
+            #print(today.weekday())
             return today.weekday()
         else:
             return totalSeconds
 
    
     def confAutomation(self):
-            print("ok starting")
+            #print("ok starting")
             if self.findNextMonday() != 0:
                 secondsRemaining = int((self.findNextMonday()*1000))
                 print("Its not monday yet", secondsRemaining)
@@ -129,7 +129,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.worker = worker()
         self.worker.moveToThread(thread)
-        print(self.worker.thread())
+        #print(self.worker.thread())
         
         self.process = QProcess()
         #Attempts to read the csv
@@ -229,14 +229,14 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     ### End of domain tableview logic ###
     def polishedWebList(self, day=None, week=None):
         
-        print(day,week) 
+        #print(day,week) 
 
         if week != None:
             selectedDay = day
             selectedWeek = week
-            print("polish1")
+            #print("polish1")
         elif week == None:
-            print("polasi 2")
+            #print("polasi 2")
             selectedDay = self.selectDay.currentText()
             selectedWeek = self.selectWeek.currentText()
 
@@ -292,7 +292,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.wpscan()
 
     def wpscan(self): # Changes the websites that are going to be run in the config, then executest the scan
-        print("scanning")
+        #print("scanning")
         #writes updated config back to file
         absoluteConfigPath = os.path.abspath("../shellScripts/wpwatcher.conf") # retrieves path for config location
         self.consoleText.clear()
@@ -379,12 +379,12 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             config["wpwatcher"]["send_email_report"] = "No"
         
-        apiKeyFormatted = '[ "--random-user-agent", "--api-token", "'  + self.apiKeyBox.text() + '"]'
+        apiKeyFormatted = '[ "--format","json","--random-user-agent", "--api-token", "'  + self.apiKeyBox.text() + '"]'
 
         config["wpwatcher"]["email_to"] = '["' + self.emailTo.text() + '"]'
         config["wpwatcher"]["from_email"] = self.emailFrom.text()
         config["wpwatcher"]["smtp_server"] = self.smtpServer.text()
-        config["wpwatcher"]["smtp_user"] = self.smtpServer.text()
+        config["wpwatcher"]["smtp_user"] = self.emailFrom.text()
         config["wpwatcher"]["smtp_pass"] = self.passwordBox.text()
         config["wpwatcher"]["wpscan_args"] = apiKeyFormatted
 
