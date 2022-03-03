@@ -12,9 +12,6 @@ from PyQt5.QtCore import QProcess, Qt, QThread, QTimer
 from mainUi import Ui_MainWindow
 from pandascontroller import DomainInput, DomainsTableModel
 
-#TESTING 
-from freezegun import freeze_time
-
 
 class worker(QtCore.QObject): # Worker object for auto scan
 
@@ -43,7 +40,7 @@ class worker(QtCore.QObject): # Worker object for auto scan
         #print("cleared")
         schedule.clear()
 
-    @freeze_time("2022-02-14", as_kwarg='test3')
+    
     def automateScan(self, test3): 
         
         print("executing")
@@ -79,7 +76,7 @@ class worker(QtCore.QObject): # Worker object for auto scan
             schedule.every().thursday.do(self.startScan.emit, "thursday", "Week 4")
             schedule.every().friday.do(self.startScan.emit, "friday", "Week 4")
 
-    @freeze_time("2022-02-14", as_kwarg='test1')
+    
     def findNextMonday(self, test1):
         #print("finding date")
         today = datetime.date.today()
@@ -164,13 +161,19 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         ### Starts a manual wpscan of all the websites on the selected day (WIP) ###
         self.initiateManualScan.clicked.connect(self.polishedWebList) 
 
+        #Starts auomation
         self.automationEnable.stateChanged.connect(self.isChecked)
   
         self.worker.startScan.connect(self.polishedWebList)
 
+        #displays how long until next scan
         self.worker.updateConsole.connect(self.timeReminaing)
 
+        #detects when scan is finished
         self.process.finished.connect(self.process_end)
+
+        #changes menu
+        self.manualToggle.stateChanged.connect(self.changeMenu)
 
 
 
@@ -230,43 +233,45 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def polishedWebList(self, day=None, week=None):
         
         #print(day,week) 
+        if self.manualInput.isHidden():
 
-        if week != None:
-            selectedDay = day
-            selectedWeek = week
-            #print("polish1")
-        elif week == None:
-            #print("polasi 2")
-            selectedDay = self.selectDay.currentText()
-            selectedWeek = self.selectWeek.currentText()
+            if week != None:
+                selectedDay = day
+                selectedWeek = week
+                #print("polish1")
+            elif week == None:
+                #print("polasi 2")
+                selectedDay = self.selectDay.currentText()
+                selectedWeek = self.selectWeek.currentText()
 
-        if selectedWeek == "Week 1":
+            if selectedWeek == "Week 1":
 
-            domainListData = self.data.loc[:, "monday":"friday"]
+                domainListData = self.data.loc[:, "monday":"friday"]
 
-        elif selectedWeek == "Week 2":
-            
-            domainListData = self.data.loc[:, "monday.1":"friday.1"]
-            selectedDay = selectedDay + ".1"
+            elif selectedWeek == "Week 2":
+                
+                domainListData = self.data.loc[:, "monday.1":"friday.1"]
+                selectedDay = selectedDay + ".1"
 
-        elif selectedWeek == "Week 3":
-            
-            domainListData = self.data.loc[:, "monday.2":"friday.2"]
-            selectedDay = selectedDay + ".2"
+            elif selectedWeek == "Week 3":
+                
+                domainListData = self.data.loc[:, "monday.2":"friday.2"]
+                selectedDay = selectedDay + ".2"
 
-        elif selectedWeek == "Week 4":
-            
-            domainListData = self.data.loc[:, "monday.3":"friday.3"]
-            selectedDay = selectedDay + ".3"
-            
+            elif selectedWeek == "Week 4":
+                
+                domainListData = self.data.loc[:, "monday.3":"friday.3"]
+                selectedDay = selectedDay + ".3"
+            selectedDay = selectedDay.lower()
+            listOfWebsites = domainListData[selectedDay].tolist()
+        else:
+            website = self.manualInput.text()
+            listOfWebsites = []
+            listOfWebsites.append(website)
+
         wpConfig = configparser.ConfigParser()
+    
         
-
-
-
-
-        selectedDay = selectedDay.lower()
-        listOfWebsites = domainListData[selectedDay].tolist()
         #print(selectedDay, listOfWebsites)
 
         cleanWebsiteList = []
@@ -345,7 +350,20 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
             event.ignore()
 
+    def changeMenu(self):
+        if self.manualInput.isHidden():
+            self.manualInput.show()
+            self.selectWeek.hide()
+            self.selectDay.hide()
+        else:
+            self.manualInput.hide()
+            self.selectWeek.show()
+            self.selectDay.show()
+
     def firstTimeSetup(self): #Ask for setup on first time running
+        
+        self.createTableModel()
+
         if not exists("../shellScripts/wpwatcher.conf"):
             os.system("wpwatcher --template_conf > ../shellScripts/wpwatcher.conf")
             fileCheck = QtWidgets.QMessageBox()
