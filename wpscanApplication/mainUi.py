@@ -11,11 +11,13 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QFormLayout, QGroupBox, QHBoxLayout)
+from PyQt5.QtGui import QPixmap
 from qtwidgets import AnimatedToggle
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        self.setWindowIcon(QtGui.QIcon("icons/taskIcon.png"))
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(800, 400)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -114,6 +116,14 @@ class Ui_MainWindow(object):
         container.setGeometry(QtCore.QRect(180,245,80,100))
 
 
+        self.logo = QtWidgets.QLabel(self.scanTab)
+        companyLogo = QPixmap('icons/mcsLogo.png')
+        self.logo.setPixmap(companyLogo)
+
+
+
+  
+
         self.selectDomainWeek = QtWidgets.QComboBox(self.domainList) # domain list viewing
         self.selectDomainWeek.setGeometry(QtCore.QRect(10, 110, 100, 25))
         self.selectDomainWeek.setObjectName("selectDomainWeek")
@@ -180,7 +190,7 @@ class Ui_MainWindow(object):
         self.apiKeyBox = QtWidgets.QLineEdit()
 
         self.saveOptions = QtWidgets.QPushButton()
-        self.saveOptions.setFixedSize(QtCore.QSize(100,25))
+        self.saveOptions.setFixedSize(QtCore.QSize(100,25))        
 
         self.configForm = QGroupBox("Options", self.optionsPage)
         layout = QFormLayout()
@@ -192,6 +202,7 @@ class Ui_MainWindow(object):
         layout.addRow(QtWidgets.QLabel("WPSCAN API Key: "), self.apiKeyBox)
         layout.addRow(self.saveOptions)
         
+
 
         self.configForm.setLayout(layout)
         
