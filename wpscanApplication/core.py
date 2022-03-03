@@ -118,7 +118,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
 
-
+        
         
         global thread
         thread = QtCore.QThread(self)
