@@ -18,9 +18,7 @@ dependencies:
 
 Planned Features:
 - ~~Warn user of killing process (Are you sure button)~~
-- Notify user that automation is in progress 
-    - When next scan is due
-- MCS logo 
+- ~~MCS logo~~
 
 
 
