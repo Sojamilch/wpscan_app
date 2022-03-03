@@ -11,6 +11,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QFormLayout, QGroupBox, QHBoxLayout)
+from qtwidgets import AnimatedToggle
 
 
 class Ui_MainWindow(object):
@@ -40,8 +41,9 @@ class Ui_MainWindow(object):
         self.initiateManualScan.setObjectName("initiateManualScan")
 
         self.automationEnable = QtWidgets.QCheckBox(self.scanTab)
-        self.automationEnable.setGeometry(QtCore.QRect(350, 220, 101, 23))
+        self.automationEnable.setGeometry(QtCore.QRect(350, 180, 101, 23))
         self.automationEnable.setObjectName("automationEnable")
+        self.automationEnable.setToolTip("This will automatically scan each respective day on that day")
 
       #  self.scanProgressBar = QtWidgets.QProgressBar(self.scanTab)
      #   self.scanProgressBar.setGeometry(QtCore.QRect(340, 190, 120, 25))
@@ -72,9 +74,9 @@ class Ui_MainWindow(object):
         self.addDomain.setGeometry(QtCore.QRect(290, 30, 100, 25))
         self.addDomain.setObjectName("addDomain")
         
-        self.syncList = QtWidgets.QPushButton(self.domainList)
-        self.syncList.setGeometry(QtCore.QRect(685, 110, 100, 25))
-        self.syncList.setObjectName("syncList")
+        # self.syncList = QtWidgets.QPushButton(self.domainList)
+        # self.syncList.setGeometry(QtCore.QRect(685, 110, 100, 25))
+        # self.syncList.setObjectName("syncList")
         
         self.selectWeek = QtWidgets.QComboBox(self.scanTab) # scantab week selection
         self.selectWeek.setGeometry(QtCore.QRect(300, 260, 200, 26))
@@ -93,7 +95,24 @@ class Ui_MainWindow(object):
         self.selectDay.addItem("Wednesday")
         self.selectDay.addItem("Thursday")
         self.selectDay.addItem("Friday")
-    
+
+        self.manualInput = QtWidgets.QLineEdit(self.scanTab)
+        self.manualInput.setGeometry(QtCore.QRect(250,280,300,26))
+        self.manualInput.setPlaceholderText("https://www.wordpressite.com")
+        self.manualInput.hide()
+
+        helpText = QtWidgets.QLabel(self.scanTab)
+        helpText.setText("Which website would you like to scan?")
+        helpText.setGeometry(QtCore.QRect(280,220,300,26))
+
+        self.manualToggle = AnimatedToggle()
+        container = QtWidgets.QWidget(self.scanTab)
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(self.manualToggle)
+        container.setLayout(layout)
+
+        container.setGeometry(QtCore.QRect(180,245,80,100))
+
 
         self.selectDomainWeek = QtWidgets.QComboBox(self.domainList) # domain list viewing
         self.selectDomainWeek.setGeometry(QtCore.QRect(10, 110, 100, 25))
@@ -204,7 +223,7 @@ class Ui_MainWindow(object):
         #self.domainInput.setText(_translate("MainWindow", ''))
         self.label.setText(_translate("MainWindow", "Add Domain"))
         self.addDomain.setText(_translate("MainWindow", "Add domain"))
-        self.syncList.setText(_translate("MainWindow", "Sync List"))
+        # self.syncList.setText(_translate("MainWindow", "Sync List"))
         self.saveOptions.setText(_translate("MainWindow", "Save Options"))
         
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.domainList), _translate("MainWindow", "Domains"))
