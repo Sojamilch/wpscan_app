@@ -42,10 +42,6 @@ class Ui_MainWindow(object):
         self.initiateManualScan.setIconSize(QtCore.QSize(16, 16))
         self.initiateManualScan.setObjectName("initiateManualScan")
 
-        self.automationEnable = QtWidgets.QCheckBox(self.scanTab)
-        self.automationEnable.setGeometry(QtCore.QRect(350, 180, 101, 23))
-        self.automationEnable.setObjectName("automationEnable")
-        self.automationEnable.setToolTip("This will automatically scan each respective day on that day")
 
       #  self.scanProgressBar = QtWidgets.QProgressBar(self.scanTab)
      #   self.scanProgressBar.setGeometry(QtCore.QRect(340, 190, 120, 25))
@@ -119,6 +115,7 @@ class Ui_MainWindow(object):
         self.logo = QtWidgets.QLabel(self.scanTab)
         companyLogo = QPixmap('icons/mcsLogo.png')
         self.logo.setPixmap(companyLogo)
+        self.logo.setGeometry(QtCore.QRect(10,10,120,60))
 
 
 
@@ -192,6 +189,19 @@ class Ui_MainWindow(object):
         self.saveOptions = QtWidgets.QPushButton()
         self.saveOptions.setFixedSize(QtCore.QSize(100,25))        
 
+        self.automationEnable = AnimatedToggle()    
+        container2 = QtWidgets.QWidget(self.optionsPage)
+        layout2 = QtWidgets.QVBoxLayout()
+        layout2.addWidget(self.automationEnable)
+        container2.setLayout(layout)
+
+
+        #self.automationEnable = QtWidgets.QCheckBox(self.optionsPage)
+        container2.setGeometry(QtCore.QRect(300, 300, 250, 23))
+        self.automationEnable.setObjectName("automationEnable")
+        self.automationEnable.setToolTip("This will automatically scan each respective day on that day")
+
+
         self.configForm = QGroupBox("Options", self.optionsPage)
         layout = QFormLayout()
         layout.addRow(QtWidgets.QLabel("Send Email Report?"), self.emailReport)
@@ -229,7 +239,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Wordpress Vunerabiltiy Scanner"))
         self.initiateManualScan.setText(_translate("MainWindow", "SCAN"))
-        self.automationEnable.setText(_translate("MainWindow", "Automate?"))
+        self.automationEnable.setText(_translate("MainWindow", "Automate scanning Process"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.scanTab), _translate("MainWindow", "Scan"))
         #self.domainInput.setText(_translate("MainWindow", ''))
         self.label.setText(_translate("MainWindow", "Add Domain"))

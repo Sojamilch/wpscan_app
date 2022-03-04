@@ -12,7 +12,8 @@ from PyQt5.QtCore import QProcess, Qt, QThread, QTimer
 from mainUi import Ui_MainWindow
 from pandascontroller import DomainInput, DomainsTableModel
 
-
+from freezegun import freeze_time
+#@freeze_time("2022-03-07")
 class worker(QtCore.QObject): # Worker object for auto scan
 
     startScan = QtCore.pyqtSignal(str, str)
@@ -41,7 +42,7 @@ class worker(QtCore.QObject): # Worker object for auto scan
         schedule.clear()
 
     
-    def automateScan(self, test3): 
+    def automateScan(self, ): 
         
         print("executing")
         if self.findNextMonday() == 0 and self.currentDay == 0:
@@ -77,7 +78,7 @@ class worker(QtCore.QObject): # Worker object for auto scan
             schedule.every().friday.do(self.startScan.emit, "friday", "Week 4")
 
     
-    def findNextMonday(self, test1):
+    def findNextMonday(self, ):
         #print("finding date")
         today = datetime.date.today()
         
