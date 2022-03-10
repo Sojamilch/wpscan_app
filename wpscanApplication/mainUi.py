@@ -103,13 +103,6 @@ class Ui_MainWindow(object):
         helpText.setText("Which website would you like to scan?")
         helpText.setGeometry(QtCore.QRect(280,220,300,26))
 
-        self.manualToggle = AnimatedToggle()
-        container = QtWidgets.QWidget(self.scanTab)
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self.manualToggle)
-        container.setLayout(layout)
-
-        container.setGeometry(QtCore.QRect(180,245,80,100))
 
 
         self.logo = QtWidgets.QLabel(self.scanTab)
@@ -118,6 +111,13 @@ class Ui_MainWindow(object):
         self.logo.setGeometry(QtCore.QRect(10,10,120,60))
 
 
+        self.manualToggle = AnimatedToggle()
+        container = QtWidgets.QWidget(self.scanTab)
+        layout = QtWidgets.QHBoxLayout()
+        layout.addWidget(self.manualToggle)
+        container.setLayout(layout)
+
+        container.setGeometry(QtCore.QRect(180,245,80,100))
 
   
 
@@ -189,37 +189,28 @@ class Ui_MainWindow(object):
         self.saveOptions = QtWidgets.QPushButton()
         self.saveOptions.setFixedSize(QtCore.QSize(100,25))        
 
-        self.automationEnable = AnimatedToggle()    
-        container2 = QtWidgets.QWidget(self.optionsPage)
-        layout2 = QtWidgets.QVBoxLayout()
-        layout2.addWidget(self.automationEnable)
-        container2.setLayout(layout)
-
-
-        #self.automationEnable = QtWidgets.QCheckBox(self.optionsPage)
-        container2.setGeometry(QtCore.QRect(300, 300, 250, 23))
-        self.automationEnable.setObjectName("automationEnable")
-        self.automationEnable.setToolTip("This will automatically scan each respective day on that day")
-
-
         self.configForm = QGroupBox("Options", self.optionsPage)
-        layout = QFormLayout()
-        layout.addRow(QtWidgets.QLabel("Send Email Report?"), self.emailReport)
-        layout.addRow(QtWidgets.QLabel("Email to:"), self.emailTo)
-        layout.addRow(QtWidgets.QLabel("Email from:"), self.emailFrom)
-        layout.addRow(QtWidgets.QLabel("SMTP Server: "), self.smtpServer)
-        layout.addRow(QtWidgets.QLabel("Sender Password: "), self.passwordBox)
-        layout.addRow(QtWidgets.QLabel("WPSCAN API Key: "), self.apiKeyBox)
-        layout.addRow(self.saveOptions)
+        layoutThree = QFormLayout()
+        layoutThree.addRow(QtWidgets.QLabel("Send Email Report?"), self.emailReport)
+        layoutThree.addRow(QtWidgets.QLabel("Email to:"), self.emailTo)
+        layoutThree.addRow(QtWidgets.QLabel("Email from:"), self.emailFrom)
+        layoutThree.addRow(QtWidgets.QLabel("SMTP Server: "), self.smtpServer)
+        layoutThree.addRow(QtWidgets.QLabel("Sender Password: "), self.passwordBox)
+        layoutThree.addRow(QtWidgets.QLabel("WPSCAN API Key: "), self.apiKeyBox)
+        layoutThree.addRow(self.saveOptions)
+        self.configForm.setLayout(layoutThree)
         
-
-
-        self.configForm.setLayout(layout)
-        
-
         self.optionsBox.addWidget(self.configForm)
         
-        self.optionsBox.setGeometry(QtCore.QRect(50,25,100,100))
+        self.automationEnable = AnimatedToggle()
+        label = QtWidgets.QLabel("Automate Scanning")    
+        containerTwo = QtWidgets.QWidget(self.optionsPage)
+        layoutTwo = QtWidgets.QHBoxLayout()
+        layoutTwo.addWidget(self.automationEnable)
+        layoutTwo.addWidget(label)
+        containerTwo.setLayout(layoutTwo)
+
+        containerTwo.setGeometry(QtCore.QRect(250, 125, 220, 325))
 
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 400, 22))
