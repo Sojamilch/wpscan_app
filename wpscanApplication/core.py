@@ -4,14 +4,13 @@ from os.path import exists
 from datetime import datetime, timedelta
 from re import S
 import sys
-from numpy import diff
-import schedule
 import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QProcess, Qt, QThread, QTimer
 from mainUi import Ui_MainWindow
 from pandascontroller import DomainInput, DomainsTableModel
 from apscheduler.schedulers.qt import QtScheduler 
+from freezegun import freeze_time
 
 class worker(QtCore.QObject): # Worker object for auto scan
 
@@ -25,7 +24,7 @@ class worker(QtCore.QObject): # Worker object for auto scan
         super(worker, self).__init__(parent)
 
 
-    #@freeze_time("2022-03-17 00:00:00")
+ 
     def automateScan(self, date): 
         
         scanningSchedule = QtScheduler(timezone="UTC")
@@ -36,8 +35,11 @@ class worker(QtCore.QObject): # Worker object for auto scan
 
         i = 0
 
+        #freezer = freeze_time("2022-03-15 00:00:00")
+        #freezer.start()
         date = date.toPyDate()  
         
+        print(date)
         date = date - timedelta(days=28)
         startOfWeek = date
 
@@ -45,10 +47,9 @@ class worker(QtCore.QObject): # Worker object for auto scan
             for day in days:
                 i += 1
 
-                
-                
-
                 i = str(i)
+
+                print(date)
 
                 scanningSchedule.add_job(self.startScan.emit, 'interval', args=[f"{day}", f"{week}"], days=28, start_date=date, id=i)
 
@@ -70,21 +71,21 @@ class worker(QtCore.QObject): # Worker object for auto scan
 
 
      
-    def findNextMonday(self, ):
+    # def findNextMonday(self, ):
 
-        today = datetime.date.today()
+    #     today = datetime.date.today()
         
-        comingMonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
+    #     comingMonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
         
-        difference = comingMonday - today
+    #     difference = comingMonday - today
 
-        totalSeconds = difference.total_seconds()
+    #     totalSeconds = difference.total_seconds()
       
-        if today.weekday() == 0:
+    #     if today.weekday() == 0:
 
-            return today.weekday()
-        else:
-            return totalSeconds
+    #         return today.weekday()
+    #     else:
+    #         return totalSeconds
 
    
     
@@ -221,6 +222,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     ### End of domain tableview logic ###
     def polishedWebList(self, day=None, week=None):
          
+
         if self.manualInput.isHidden():
 
             if week != None:
@@ -328,10 +330,9 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def closeEvent(self, event): # Warns user when trying to close program
         questionBox = QtWidgets.QMessageBox
 
-        if self.automationEnable.isChecked() or self.process.state() == 2 or schedule.get_jobs():
+        if self.automationEnable.isChecked() or self.process.state() == 2:
             answer = questionBox.question(self, '', "Are you sure you want to close? \n You will cancel the current schedule!", questionBox.Yes | questionBox.No)
 
-        test = schedule.get_jobs()
         if answer == questionBox.Yes:
          
             event.accept()
@@ -400,6 +401,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         saveComplete = QtWidgets.QMessageBox()
         saveComplete.about(self,"Success!","Options saved to wpwatcher.conf!")
+
 
 
 if __name__ == '__main__': # Automatically builds the objects when the program is loaded

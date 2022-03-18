@@ -7,9 +7,8 @@ from posixpath import defpath
 
 import numpy as np
 import pandas as pd
-from PyQt5 import QtCore, QtWidgets, uic
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QAbstractTableModel, Qt
-from PyQt5.QtSql import *
 
 
 class DomainsTableModel(QAbstractTableModel): # Generates a model for a tableview using pandas dataframes as the data
