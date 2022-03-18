@@ -12,7 +12,6 @@ from PyQt5.QtCore import QProcess, Qt, QThread, QTimer
 from mainUi import Ui_MainWindow
 from pandascontroller import DomainInput, DomainsTableModel
 from apscheduler.schedulers.qt import QtScheduler 
-from freezegun import freeze_time
 
 class worker(QtCore.QObject): # Worker object for auto scan
 
