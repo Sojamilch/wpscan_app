@@ -141,6 +141,6 @@ package/db.ini
 .wpscanDomainList.db
 .wpscanDomainList
 wpscanDomainList.db
-shellScripts/wpwatcher.conf
-domains/domains.csv
+wpscanApplication/shellScripts/wpwatcher.conf
+wpscanApplication/domains/domains.csv
 wpscanApplication/__pycache__
