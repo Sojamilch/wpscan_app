@@ -9,6 +9,7 @@
 # Generates all the objects for the UI elements
 
 
+from enum import auto
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import (QFormLayout, QGroupBox, QHBoxLayout)
 from PyQt5.QtGui import QPixmap
@@ -88,11 +89,11 @@ class Ui_MainWindow(object):
         self.selectDay = QtWidgets.QComboBox(self.scanTab) # scantab day selection 
         self.selectDay.setGeometry(QtCore.QRect(300, 300, 200, 26))
         self.selectDay.setObjectName("selectDay")
-        self.selectDay.addItem("Monday")
-        self.selectDay.addItem("Tuesday")
-        self.selectDay.addItem("Wednesday")
-        self.selectDay.addItem("Thursday")
-        self.selectDay.addItem("Friday")
+        self.selectDay.addItem("Day 1")
+        self.selectDay.addItem("Day 2")
+        self.selectDay.addItem("Day 3")
+        self.selectDay.addItem("Day 4")
+        self.selectDay.addItem("Day 5")
 
         self.manualInput = QtWidgets.QLineEdit(self.scanTab)
         self.manualInput.setGeometry(QtCore.QRect(250,280,300,26))
@@ -171,6 +172,33 @@ class Ui_MainWindow(object):
         self.optionsPage.setObjectName("optionsPage")
         self.tabWidget.addTab(self.optionsPage, "")
 
+
+
+        
+
+
+
+        
+        # self.containerTwo = QtWidgets.QWidget(self.optionsPage)
+        # layoutTwo = QtWidgets.QGridLayout()
+        # layoutTwo.setHorizontalSpacing(20)
+        # layoutTwo.setVerticalSpacing(0)
+        # layoutTwo.addWidget(self.automationEnable,1,1,QtCore.Qt.AlignCenter)
+        # layoutTwo.addWidget(label3,0,0)
+        # layoutTwo.addWidget(label1,0,1)
+        # layoutTwo.addWidget(label2,0,3)
+        
+        # layoutTwo.addWidget(self.dateSelector,1,3)
+        # self.containerTwo.setLayout(layoutTwo)
+
+        #self.containerTwo.setGeometry(QtCore.QRect(250, 250, 350, 75))
+
+
+
+
+
+
+
         self.optionsBox = QtWidgets.QVBoxLayout(self.optionsPage)
 
         self.passwordBox = QtWidgets.QLineEdit()
@@ -199,18 +227,55 @@ class Ui_MainWindow(object):
         layoutThree.addRow(QtWidgets.QLabel("WPSCAN API Key: "), self.apiKeyBox)
         layoutThree.addRow(self.saveOptions)
         self.configForm.setLayout(layoutThree)
-        
+
         self.optionsBox.addWidget(self.configForm)
         
-        self.automationEnable = AnimatedToggle()
-        label = QtWidgets.QLabel("Automate Scanning")    
-        containerTwo = QtWidgets.QWidget(self.optionsPage)
-        layoutTwo = QtWidgets.QHBoxLayout()
-        layoutTwo.addWidget(self.automationEnable)
-        layoutTwo.addWidget(label)
-        containerTwo.setLayout(layoutTwo)
+        
+        
 
-        containerTwo.setGeometry(QtCore.QRect(250, 125, 220, 325))
+        
+
+        self.dateSelector = QtWidgets.QDateEdit(calendarPopup=True)
+        
+
+        self.automationEnable = AnimatedToggle()
+        
+       
+        self.automationForm = QtWidgets.QWidget(self.optionsPage)
+        
+        
+
+        self.automation = QtWidgets.QGridLayout(self.automationForm)
+
+
+
+        self.label1 = QtWidgets.QLabel(self.automationForm)    
+        self.label2 = QtWidgets.QLabel(self.automationForm)
+        self.label3 = QtWidgets.QLabel(self.automationForm)
+        self.label4 = QtWidgets.QLabel(self.automationForm)
+        self.label3.setWordWrap(True)
+        self.label3.setFixedWidth(300)
+        self.automationEnable.setFixedWidth(100)
+
+
+
+        self.automation.setHorizontalSpacing(100)
+
+        self.automation.addWidget(self.label3, 0,0)
+        self.automation.addWidget(self.label4, 1,0)
+        self.automation.addWidget(self.label2, 0,2)
+        self.automation.addWidget(self.label1, 0,1)
+        self.automation.addWidget(self.automationEnable, 1,1,QtCore.Qt.AlignCenter|QtCore.Qt.AlignHCenter)
+        self.automation.addWidget(self.dateSelector, 1,2, QtCore.Qt.AlignCenter|QtCore.Qt.AlignHCenter)
+
+    
+        
+
+        self.automationForm.setLayout(self.automation)
+
+        self.optionsBox.addWidget(self.automationForm)
+
+
 
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 400, 22))
@@ -237,7 +302,11 @@ class Ui_MainWindow(object):
         self.addDomain.setText(_translate("MainWindow", "Add domain"))
         # self.syncList.setText(_translate("MainWindow", "Sync List"))
         self.saveOptions.setText(_translate("MainWindow", "Save Options"))
-        
+        self.label3.setText(_translate("MainWindow", "Automated Scanning:"))
+        self.label4.setText(_translate("MainWindow", "This will scan once per day, in order of the website list. \n""After all 4 weeks have passed it will loop."))
+        self.label2.setText(_translate("MainWindow", "Select Start Date"))
+        self.label1.setText(_translate("MainWindow", "Automate Scanning"))
+
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.domainList), _translate("MainWindow", "Domains"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.logPage), _translate("MainWindow", "Log"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.optionsPage), _translate("MainWindow", "Options"))

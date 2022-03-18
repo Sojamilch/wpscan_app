@@ -39,7 +39,7 @@ class DomainsTableModel(QAbstractTableModel): # Generates a model for a tablevie
 
     def headerData(self, col, orientation, role):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            headerLabels = ['Monday', 'Tuesday', 'Wednesday','Thursday','Friday','Monday', 'Tuesday', 'Wednesday','Thursday','Friday','Monday', 'Tuesday', 'Wednesday','Thursday','Friday','Monday', 'Tuesday', 'Wednesday','Thursday','Friday']
+            headerLabels = ['Day 1', 'Day 2', 'Day 3','Day 4','Day 5','Day 1', 'Day 2', 'Day 3','Day 4','Day 5','Day 1', 'Day 2', 'Day 3','Day 4','Day 5','Day 1', 'Day 2', 'Day 3','Day 4','Day 5']
             return headerLabels[col]
             #self._data.columns[col]
 
@@ -78,13 +78,12 @@ class DomainInput(): # writes domains into the csv ]
                     if nextCell is None or np.isnan(nextCell) or df.isnull(nextCell) or pd.isna(nextCell): #detects if cell is null value/nothing in cell
                         df.iat[index, dayOfMonth] = domainName #replaces said cell with input domain
                         writeToCv() # saves cv
-                        print(df)
+                     
                         return df
                     
                 except: 
                     #print(nextCell, "Is not null/nan") DEBUG PURPOSES
                     if nextCell == df.iat[-1,-1]: # if at last value of dataframe add new line to end of dataframe 
-                        print("adding new empty line")
                         df = df.append(pd.Series(), ignore_index=True)
                         writeToCv()
         

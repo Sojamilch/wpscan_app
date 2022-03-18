@@ -1,7 +1,7 @@
 import configparser
 import os
 from os.path import exists
-import datetime
+from datetime import datetime, timedelta
 from re import S
 import sys
 from numpy import diff
@@ -11,9 +11,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QProcess, Qt, QThread, QTimer
 from mainUi import Ui_MainWindow
 from pandascontroller import DomainInput, DomainsTableModel
-
+from apscheduler.schedulers.qt import QtScheduler 
 from freezegun import freeze_time
-#@freeze_time("2022-03-07")
+
 class worker(QtCore.QObject): # Worker object for auto scan
 
     startScan = QtCore.pyqtSignal(str, str)
@@ -24,62 +24,55 @@ class worker(QtCore.QObject): # Worker object for auto scan
 
     def __init__(self, parent=None):
         super(worker, self).__init__(parent)
-        self.currentDay = 0
-        self.updateCurrentDay.connect(self.updateDay)
-      
+
+
+    #@freeze_time("2022-03-17 00:00:00")
+    def automateScan(self, date): 
         
+        scanningSchedule = QtScheduler(timezone="UTC")
+
+        days = ["day1", "day2", "day3", "day4", "day5"]
+
+        weeks = ["Week 1", "Week 2", "Week 3 ", "Week 4"]
+
+        i = 0
+
+        date = date.toPyDate()  
         
-    def updateDay(self):
-        self.currentDay += 1
-    
-    def automationCheck(self, tick):
-        #print(self.check)
-        self.check = tick
-        return self.check
-    
-    def clearSchedule(self):
-        #print("cleared")
-        schedule.clear()
+        date = date - timedelta(days=28)
+        startOfWeek = date
 
-    
-    def automateScan(self, ): 
+        for week in weeks:
+            for day in days:
+                i += 1
+
+                
+                
+
+                i = str(i)
+
+                scanningSchedule.add_job(self.startScan.emit, 'interval', args=[f"{day}", f"{week}"], days=28, start_date=date, id=i)
+
+                date = date + timedelta(days=1)
+
+                i=int(i)
+
+                if i % 5 == 0:
+                    date = startOfWeek + timedelta(days=7)
+                    startOfWeek = date
+
+               
+
+
         
-        print("executing")
-        if self.findNextMonday() == 0 and self.currentDay == 0:
-            print("week 1")
-            schedule.clear()
-            self.startScan.emit("monday", "Week 1")
-            schedule.every().tuesday.do(self.startScan.emit, "tuesday", "Week 1")
-            schedule.every().wednesday.do(self.startScan.emit, "wednesday", "Week 1")
-            schedule.every().thursday.do(self.startScan.emit, "thursday", "Week 1")
-            schedule.every().friday.do(self.startScan.emit, "friday", "Week 1")
+        scanningSchedule.start()
 
-        elif self.currentDay == 5:
-            print("week 2")
-            schedule.clear()
-            self.startScan.emit("monday", "Week 2")
-            schedule.every().tuesday.do(self.startScan.emit, "tuesday", "Week 2")
-            schedule.every().wednesday.do(self.startScan.emit, "wednesday", "Week 2")
-            schedule.every().thursday.do(self.startScan.emit, "thursday", "Week 2")
-            schedule.every().friday.do(self.startScan.emit, "friday", "Week 2")
 
-        elif self.currentDay == 10:
-            self.startScan.emit("monday", "Week 3")
-            schedule.every().tuesday.do(self.startScan.emit, "tuesday", "Week 3")
-            schedule.every().wednesday.do(self.startScan.emit, "wednesday", "Week 3")
-            schedule.every().thursday.do(self.startScan.emit, "thursday", "Week 3")
-            schedule.every().friday.do(self.startScan.emit, "friday", "Week 3")
 
-        elif self.currentDay == 15:
-            self.startScan.emit("monday", "Week 4")
-            schedule.every().tuesday.do(self.startScan.emit, "tuesday", "Week 4")
-            schedule.every().wednesday.do(self.startScan.emit, "wednesday", "Week 4")
-            schedule.every().thursday.do(self.startScan.emit, "thursday", "Week 4")
-            schedule.every().friday.do(self.startScan.emit, "friday", "Week 4")
 
-    
+     
     def findNextMonday(self, ):
-        #print("finding date")
+
         today = datetime.date.today()
         
         comingMonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
@@ -87,23 +80,18 @@ class worker(QtCore.QObject): # Worker object for auto scan
         difference = comingMonday - today
 
         totalSeconds = difference.total_seconds()
-
       
         if today.weekday() == 0:
-            #print(today.weekday())
+
             return today.weekday()
         else:
             return totalSeconds
 
    
-    def confAutomation(self):
-            #print("ok starting")
-            if self.findNextMonday() != 0:
-                secondsRemaining = int((self.findNextMonday()*1000))
-                print("Its not monday yet", secondsRemaining)
-                self.updateConsole.emit("Waiting: " + str(secondsRemaining) + " seconds")
-            else:
-                self.automateScan()
+    
+
+
+
                 
             
 
@@ -127,7 +115,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.worker = worker()
         self.worker.moveToThread(thread)
-        #print(self.worker.thread())
+       
         
         self.process = QProcess()
         #Attempts to read the csv
@@ -135,7 +123,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
             self.data = pd.read_csv('../domains/domains.csv', dtype=object)   
         except:
             # Adds column headers if none detected
-            columnHeaders = ["monday","tuesday","wednesday","thursday","friday","monday.1","tuesday.1","wednesday.1","thursday.1","friday.1","monday.2","tuesday.2","wednesday.2","thursday.2","friday.2","monday.3","tuesday.3","wednesday.3","thursday.3","friday.3"]    
+            columnHeaders = ["day1","day2","day3","day4","day5","day1.1","day2.1","day3.1","day4.1","day5.1","day1.2","day2.2","day3.2","day4.2","day5.2","day1.3","day2.3","day3.3","day4.3","day5.3"]    
             self.data = pd.DataFrame(None, columns=columnHeaders)
 
         # Adds a blank line to the end of the dataframe if there are no rows
@@ -143,6 +131,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.data.shape[0] == 0: 
             self.data = self.data.append(pd.Series(), ignore_index=True)
 
+        self.dateSelector.setMinimumDate(datetime.today())
         
 
       
@@ -193,19 +182,19 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         if self.selectDomainWeek.currentText() == "Week 1":
 
-            domainListData = self.data.loc[:, "monday":"friday"]
+            domainListData = self.data.loc[:, "day1":"day5"]
 
         elif self.selectDomainWeek.currentText() == "Week 2":
             
-            domainListData = self.data.loc[:, "monday.1":"friday.1"]
+            domainListData = self.data.loc[:, "day1.1":"day5.1"]
 
         elif self.selectDomainWeek.currentText() == "Week 3":
             
-            domainListData = self.data.loc[:, "monday.2":"friday.2"]
+            domainListData = self.data.loc[:, "day1.2":"day5.2"]
 
         elif self.selectDomainWeek.currentText() == "Week 4":
             
-            domainListData = self.data.loc[:, "monday.3":"friday.3"]
+            domainListData = self.data.loc[:, "day1.3":"day5.3"]
 
         model = DomainsTableModel(domainListData) # creates the model
         
@@ -232,36 +221,37 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
     ### End of domain tableview logic ###
     def polishedWebList(self, day=None, week=None):
-        
-        #print(day,week) 
+         
         if self.manualInput.isHidden():
 
             if week != None:
                 selectedDay = day
+                selectedDay = selectedDay.replace(" ", "")
                 selectedWeek = week
-                #print("polish1")
+               
             elif week == None:
-                #print("polasi 2")
+                
                 selectedDay = self.selectDay.currentText()
                 selectedWeek = self.selectWeek.currentText()
+                selectedDay = selectedDay.replace(" ", "")
 
             if selectedWeek == "Week 1":
 
-                domainListData = self.data.loc[:, "monday":"friday"]
+                domainListData = self.data.loc[:, "day1":"day5"]
 
             elif selectedWeek == "Week 2":
                 
-                domainListData = self.data.loc[:, "monday.1":"friday.1"]
+                domainListData = self.data.loc[:, "day1.1":"day5.1"]
                 selectedDay = selectedDay + ".1"
 
             elif selectedWeek == "Week 3":
                 
-                domainListData = self.data.loc[:, "monday.2":"friday.2"]
+                domainListData = self.data.loc[:, "day1.2":"day5.2"]
                 selectedDay = selectedDay + ".2"
 
             elif selectedWeek == "Week 4":
                 
-                domainListData = self.data.loc[:, "monday.3":"friday.3"]
+                domainListData = self.data.loc[:, "day1.3":"day5.3"]
                 selectedDay = selectedDay + ".3"
             selectedDay = selectedDay.lower()
             listOfWebsites = domainListData[selectedDay].tolist()
@@ -273,7 +263,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         wpConfig = configparser.ConfigParser()
     
         
-        #print(selectedDay, listOfWebsites)
+        
 
         cleanWebsiteList = []
         
@@ -298,7 +288,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.wpscan()
 
     def wpscan(self): # Changes the websites that are going to be run in the config, then executest the scan
-        #print("scanning")
+        
         #writes updated config back to file
         absoluteConfigPath = os.path.abspath("../shellScripts/wpwatcher.conf") # retrieves path for config location
         self.consoleText.clear()
@@ -315,7 +305,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.consoleText.append(str(text))
         
     def process_end(self): #destroys process after execution and changes button text
-        print("Finsihed...")
+       
         self.initiateManualScan.setText("Done!")
         QTimer.singleShot(2000, lambda: self.initiateManualScan.setText("SCAN"))
         self.initiateManualScan.setEnabled(True)
@@ -327,14 +317,13 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def isChecked(self):
         
         if self.automationEnable.isChecked() and self.initiateManualScan.isEnabled():
-            self.worker.confAutomation()
+            self.worker.automateScan(self.dateSelector.date())
+            self.dateSelector.setEnabled(False)
             
         else:
-            self.worker.clearSchedule()
             self.process.kill()
+            self.dateSelector.setEnabled(True)
             self.consoleText.append("Process Killed mid execution....")
-            print(self.worker.thread())
-            print("Deleted Worker - re-created worker")
 
 
     def closeEvent(self, event): # Warns user when trying to close program
