@@ -15,6 +15,8 @@ dependencies:
 - pandas
 - numpy 
 - wpwatcher/wpscan API  
+- apscheduler 
+- qtwidgets
 
 Planned Features:
 - ~~Warn user of killing process (Are you sure button)~~

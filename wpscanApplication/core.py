@@ -4,13 +4,13 @@ from os.path import exists
 from datetime import datetime, timedelta
 from re import S
 import sys
+from time import time
 import pandas as pd
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QProcess, Qt, QThread, QTimer
 from mainUi import Ui_MainWindow
 from pandascontroller import DomainInput, DomainsTableModel
 from apscheduler.schedulers.qt import QtScheduler 
-from freezegun import freeze_time
 
 class worker(QtCore.QObject): # Worker object for auto scan
 
@@ -35,12 +35,10 @@ class worker(QtCore.QObject): # Worker object for auto scan
 
         i = 0
 
-        #freezer = freeze_time("2022-03-15 00:00:00")
-        #freezer.start()
         date = date.toPyDate()  
+        print(datetime.utcnow())
         
-        print(date)
-        date = date - timedelta(days=28)
+
         startOfWeek = date
 
         for week in weeks:
@@ -49,9 +47,13 @@ class worker(QtCore.QObject): # Worker object for auto scan
 
                 i = str(i)
 
-                print(date)
-
-                scanningSchedule.add_job(self.startScan.emit, 'interval', args=[f"{day}", f"{week}"], days=28, start_date=date, id=i)
+                print(date, datetime.today().strftime("%Y-%m-%d"))
+                
+                if int(i) == 1 and str(date) == datetime.today().strftime("%Y-%m-%d"):
+                    print("first day")
+                    scanningSchedule.add_job(self.startScan.emit, 'interval', args=[f"{day}", f"{week}"], days=28, start_date=date, next_run_time=datetime.utcnow(), id=i)
+                else:
+                    scanningSchedule.add_job(self.startScan.emit, 'interval', args=[f"{day}", f"{week}"], days=28, start_date=date, id=i)
 
                 date = date + timedelta(days=1)
 
@@ -61,35 +63,12 @@ class worker(QtCore.QObject): # Worker object for auto scan
                     date = startOfWeek + timedelta(days=7)
                     startOfWeek = date
 
-               
-
-
-        
         scanningSchedule.start()
 
 
-
-
-     
-    # def findNextMonday(self, ):
-
-    #     today = datetime.date.today()
         
-    #     comingMonday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
-        
-    #     difference = comingMonday - today
 
-    #     totalSeconds = difference.total_seconds()
-      
-    #     if today.weekday() == 0:
-
-    #         return today.weekday()
-    #     else:
-    #         return totalSeconds
-
-   
     
-
 
 
                 
@@ -133,20 +112,12 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.dateSelector.setMinimumDate(datetime.today())
         
-
-      
-       
         self.updateDomainList()
         
         ### Detects when button is clicked and runs inputdomain() ###
         self.addDomain.clicked.connect(self.inputDomain) 
         
         self.selectDomainWeek.activated.connect(self.createTableModel)
-
-
-        ### Syncs domain list to latest version of list ###
-        
-        #self.syncList.clicked.connect(self.updateDomainList) 
        
         ### Starts a manual wpscan of all the websites on the selected day (WIP) ###
         self.initiateManualScan.clicked.connect(self.polishedWebList) 
@@ -164,8 +135,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         #changes menu
         self.manualToggle.stateChanged.connect(self.changeMenu)
-
-
 
         #Saves config options
         self.saveOptions.clicked.connect(self.saveConfig)
@@ -221,7 +190,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
     ### End of domain tableview logic ###
     def polishedWebList(self, day=None, week=None):
-         
+        print("weblist")
 
         if self.manualInput.isHidden():
 
@@ -289,7 +258,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.wpscan()
 
     def wpscan(self): # Changes the websites that are going to be run in the config, then executest the scan
-        
+
         #writes updated config back to file
         absoluteConfigPath = os.path.abspath("shellScripts/wpwatcher.conf") # retrieves path for config location
         self.consoleText.clear()
@@ -298,9 +267,11 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.initiateManualScan.setText("...")
         self.process.readyReadStandardOutput.connect(self.wpscanSTDOUT)
         self.process.start("bash", ['../shellScripts/wpscan.sh', absoluteConfigPath])
+    
 
         
     def wpscanSTDOUT(self): # Reads console output into log
+
         output = self.process.readAllStandardOutput()
         text = bytes(output).decode("utf8")
         self.consoleText.append(str(text))
