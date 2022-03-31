@@ -18,7 +18,7 @@ from qtwidgets import AnimatedToggle
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        self.setWindowIcon(QtGui.QIcon("icons/taskIcon.png"))
+        self.setWindowIcon(QtGui.QIcon("icons//taskicon.ico"))
         MainWindow.setObjectName("MainWindow")
         MainWindow.setFixedSize(800, 400)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -138,26 +138,10 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.logPage, "")
         MainWindow.setCentralWidget(self.centralwidget)
 
-
-
-        # for i in range(0,4):
-        #     weeks = [self.week1,self.week2,self.week3,self.week4]
-        #     weeks[i].setChecked(True)
-        #     weeks[i].setStyleSheet("""
-        #     QCheckBox::Indicator {
-        #         width: 25px;
-        #         height: 25px;
-        #     }
-        #     """)
-
-        
-
         self.logBox = QtWidgets.QGroupBox("Scan Log",self.logPage)
         consoleBox = QtWidgets.QHBoxLayout(self.logPage)
         self.consoleText = QtWidgets.QTextEdit(self.logPage)
         consoleBox.addWidget(self.consoleText)
-
-        #self.cursor = QtWidgets.QTextCursor(self.consoleText.document())
         
 
 
@@ -171,29 +155,6 @@ class Ui_MainWindow(object):
         self.optionsPage = QtWidgets.QWidget()
         self.optionsPage.setObjectName("optionsPage")
         self.tabWidget.addTab(self.optionsPage, "")
-
-
-
-        
-
-
-
-        
-        # self.containerTwo = QtWidgets.QWidget(self.optionsPage)
-        # layoutTwo = QtWidgets.QGridLayout()
-        # layoutTwo.setHorizontalSpacing(20)
-        # layoutTwo.setVerticalSpacing(0)
-        # layoutTwo.addWidget(self.automationEnable,1,1,QtCore.Qt.AlignCenter)
-        # layoutTwo.addWidget(label3,0,0)
-        # layoutTwo.addWidget(label1,0,1)
-        # layoutTwo.addWidget(label2,0,3)
-        
-        # layoutTwo.addWidget(self.dateSelector,1,3)
-        # self.containerTwo.setLayout(layoutTwo)
-
-        #self.containerTwo.setGeometry(QtCore.QRect(250, 250, 350, 75))
-
-
 
 
 
@@ -254,7 +215,9 @@ class Ui_MainWindow(object):
         self.label3 = QtWidgets.QLabel(self.automationForm)
         self.label4 = QtWidgets.QLabel(self.automationForm)
         self.label3.setWordWrap(True)
+        self.label4.setWordWrap(True)
         self.label3.setFixedWidth(300)
+        
         self.automationEnable.setFixedWidth(100)
 
 
