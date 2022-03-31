@@ -3,6 +3,7 @@ import os.path
 from cmath import isnan
 from distutils.fancy_getopt import wrap_text
 from os import close
+import sys
 from posixpath import defpath
 
 import numpy as np
@@ -59,9 +60,19 @@ class DomainInput(): # writes domains into the csv ]
 
             return df
 
+        global domains_path
+        
+        domains_name = 'domains.csv'
+
+        if getattr(sys,'frozen',False):
+            application_path = os.path.dirname(sys.executable)
+        elif __file__:
+            application_path = os.path.dirname(__file__)
+
+        domains_path = os.path.join(application_path, domains_name)
 
         def writeToCv():
-            df.to_csv("domains/domains.csv", index=False)
+            df.to_csv(domains_path, index=False)
             
 
         for index in df.index:

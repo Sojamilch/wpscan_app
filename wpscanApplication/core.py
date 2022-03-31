@@ -1,4 +1,5 @@
 import configparser
+from email.mime import application
 import os
 from os.path import exists
 from datetime import datetime, timedelta
@@ -101,12 +102,32 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.process = QProcess()
         #Attempts to read the csv
+
+        global domains_path
+        global config_path
+
+        domains_name = 'domains/domains.csv'
+        config_name = 'shellScripts/wpwatcher.conf'
+
+
+
+        if getattr(sys,'frozen',False):
+            application_path = sys._MEIPASS
+        else:
+            application_path = os.path.dirname(os.path.abspath(__file__))
+
+        domains_path = os.path.join(application_path, domains_name)
+        config_path = os.path.join(application_path, config_name)
+
+
+    
+
         try:
-            self.data = pd.read_csv('domains/domains.csv', dtype=object)   
+            self.data = pd.read_csv(domains_path, dtype=object)   
         except:
             # Adds column headers if none detected
             columnHeaders = ["day1","day2","day3","day4","day5","day1.1","day2.1","day3.1","day4.1","day5.1","day1.2","day2.2","day3.2","day4.2","day5.2","day1.3","day2.3","day3.3","day4.3","day5.3"]    
-            self.data = pd.DataFrame(None, columns=columnHeaders)
+            self.data = pd.DataFrame(None, columns=columnHeaders, dtype=object)
 
         # Adds a blank line to the end of the dataframe if there are no rows
 
@@ -181,7 +202,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         model.dataChanged.connect(self.updateDomainList)
   
     def updateDomainList(self): # this is ran when the data in the tabelview changes updating the csv
-        self.data.to_csv("domains/domains.csv", index=False)
+        self.data.to_csv(domains_path, index=False)
         
 
     def inputDomain(self): # Adds domains to CSV then refreshes table model with newest version
@@ -252,17 +273,17 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         #formatting list to match original reuqirements 
         cleanWebsiteList = ' , '.join(cleanWebsiteList) 
         
-        wpConfig.read('shellScripts/wpwatcher.conf') # reading config
+        wpConfig.read(config_path) # reading config
         wpConfig['wpwatcher']['wp_sites'] = "[" + cleanWebsiteList + "]"
         
-        with open('shellScripts/wpwatcher.conf', 'w') as configFile:
+        with open(config_path, 'w') as configFile:
             wpConfig.write(configFile)
 
         self.wpscan()
 
     def wpscan(self): # Changes the websites that are going to be run in the config, then executest the scan
         #writes updated config back to file
-        absoluteConfigPath = os.path.abspath("shellScripts/wpwatcher.conf") # retrieves path for config location
+        absoluteConfigPath = os.path.abspath(config_path) # retrieves path for config location
         self.consoleText.clear()
         self.initiateManualScan.setEnabled(False)
         self.automationEnable.setEnabled(False)
@@ -327,7 +348,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.createTableModel()
 
-        if not exists("shellScripts/wpwatcher.conf"):
+        if not exists(config_path):
             os.system("wpwatcher --template_conf > shellScripts/wpwatcher.conf")
             fileCheck = QtWidgets.QMessageBox()
             answer = fileCheck.question(self,"Setup","Please configure the scanner to continue...", fileCheck.Yes | fileCheck.No)
@@ -339,7 +360,8 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         #reads config file to options Page
         reader = configparser.ConfigParser()
-        reader.read('shellScripts/wpwatcher.conf')
+
+        reader.read(config_path)
         emailAdress = reader["wpwatcher"]["email_to"]
         emailAdress = emailAdress.strip('["]')
         self.emailTo.setText(emailAdress) 
@@ -354,7 +376,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
     def saveConfig(self):
         config = configparser.ConfigParser()
 
-        config.read('shellScripts/wpwatcher.conf') # reading config
+        config.read(config_path) # reading config
         if self.emailReport.isChecked():
             config["wpwatcher"]["send_email_report"] = "Yes"
         else:
@@ -369,7 +391,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         config["wpwatcher"]["smtp_pass"] = self.passwordBox.text()
         config["wpwatcher"]["wpscan_args"] = apiKeyFormatted
 
-        with open('shellScripts/wpwatcher.conf', 'w') as configFile:
+        with open(config_path, 'w') as configFile:
             config.write(configFile)
 
         saveComplete = QtWidgets.QMessageBox()
