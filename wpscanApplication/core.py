@@ -36,7 +36,7 @@ class worker(QtCore.QObject): # Worker object for auto scan
         i = 0
 
         date = date.toPyDate()  
-        print(datetime.utcnow())
+        #print(datetime.utcnow())
         
 
         startOfWeek = date
@@ -47,10 +47,13 @@ class worker(QtCore.QObject): # Worker object for auto scan
 
                 i = str(i)
 
-                print(date, datetime.today().strftime("%Y-%m-%d"))
+                #print(date, datetime.today().strftime("%Y-%m-%d"))
                 
+
+                #calculates when each daily job should be executed and adds to scheduler 
                 if int(i) == 1 and str(date) == datetime.today().strftime("%Y-%m-%d"):
-                    print("first day")
+                    
+                    #print("first day")
                     scanningSchedule.add_job(self.startScan.emit, 'interval', args=[f"{day}", f"{week}"], days=28, start_date=date, next_run_time=datetime.utcnow(), id=i)
                 else:
                     scanningSchedule.add_job(self.startScan.emit, 'interval', args=[f"{day}", f"{week}"], days=28, start_date=date, id=i)
@@ -190,7 +193,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
     ### End of domain tableview logic ###
     def polishedWebList(self, day=None, week=None):
-        print("weblist")
+        #print("weblist")
 
         if self.manualInput.isHidden():
 
@@ -258,7 +261,6 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.wpscan()
 
     def wpscan(self): # Changes the websites that are going to be run in the config, then executest the scan
-
         #writes updated config back to file
         absoluteConfigPath = os.path.abspath("shellScripts/wpwatcher.conf") # retrieves path for config location
         self.consoleText.clear()
@@ -266,7 +268,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.automationEnable.setEnabled(False)
         self.initiateManualScan.setText("...")
         self.process.readyReadStandardOutput.connect(self.wpscanSTDOUT)
-        self.process.start("bash", ['../shellScripts/wpscan.sh', absoluteConfigPath])
+        self.process.start("bash", ['shellScripts/wpscan.sh', absoluteConfigPath])
     
 
         
