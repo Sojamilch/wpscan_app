@@ -10,18 +10,13 @@ Designed using Qt Designer
 
 dependencies:
 
-- Python 3.8    
+- Python (Latest version)     
 - PyQt5 
 - pandas
 - numpy 
 - wpwatcher/wpscan API  
 - apscheduler 
 - qtwidgets
-
-Planned Features:
-- ~~Warn user of killing process (Are you sure button)~~
-- ~~MCS logo~~
-
 
 
 *Vielen Dank*
