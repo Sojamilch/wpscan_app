@@ -107,7 +107,7 @@ class Ui_MainWindow(object):
 
 
         self.logo = QtWidgets.QLabel(self.scanTab)
-        companyLogo = QPixmap('icons/mcsLogo.png')
+        companyLogo = QPixmap('icons//mcsLogo.png')
         self.logo.setPixmap(companyLogo)
         self.logo.setGeometry(QtCore.QRect(10,10,120,60))
 
