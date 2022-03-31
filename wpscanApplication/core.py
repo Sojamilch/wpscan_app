@@ -1,9 +1,7 @@
 import configparser
-from email.mime import application
 import os
 from os.path import exists
 from datetime import datetime, timedelta
-from re import S
 import sys
 from time import time
 import pandas as pd
@@ -119,7 +117,7 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         domains_path = os.path.join(application_path, domains_name)
         config_path = os.path.join(application_path, config_name)
 
-
+        print(domains_path)
     
 
         try:

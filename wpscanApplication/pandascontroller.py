@@ -62,12 +62,12 @@ class DomainInput(): # writes domains into the csv ]
 
         global domains_path
         
-        domains_name = 'domains.csv'
+        domains_name = 'domains/domains.csv'
 
         if getattr(sys,'frozen',False):
-            application_path = os.path.dirname(sys.executable)
+            application_path = sys._MEIPASS
         elif __file__:
-            application_path = os.path.dirname(__file__)
+            application_path = os.path.dirname(os.path.abspath(__file__))
 
         domains_path = os.path.join(application_path, domains_name)
 
