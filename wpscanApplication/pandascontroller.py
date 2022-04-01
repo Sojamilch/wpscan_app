@@ -1,6 +1,5 @@
-from email import header
+
 import os.path
-from cmath import isnan
 from distutils.fancy_getopt import wrap_text
 from os import close
 import sys

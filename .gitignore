@@ -144,3 +144,5 @@ wpscanDomainList.db
 wpscanApplication/shellScripts/wpwatcher.conf
 wpscanApplication/domains/domains.csv
 wpscanApplication/__pycache__
+
+add_lib.py
