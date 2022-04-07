@@ -259,18 +259,17 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         cleanWebsiteList = []
         
-        try: # incase website is invalid value it will just ignore it
-            for website in listOfWebsites:
 
-                if website == "":
-                    continue
-                else:
+        #checks if website field contains a value
+        for website in listOfWebsites:
+            if isinstance(website,float):
+                print("+1", website)
+                continue        
+            else:
+                temp = '{"url": '+'"'+ website +'"}'
 
-                    temp = '{"url": '+'"'+ website +'"}'
-
-                    cleanWebsiteList.append(temp)
-        except:
-            pass
+                cleanWebsiteList.append(temp)
+ 
 
         #formatting list to match original reuqirements 
         cleanWebsiteList = ' , '.join(cleanWebsiteList) 
@@ -366,10 +365,20 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         reader.read(config_path)
         emailAdress = reader["wpwatcher"]["email_to"]
         emailAdress = emailAdress.strip('["]')
+
+        try:
+            apiKey = reader["wpwatcher"]["wpscan_args"]
+        except:
+            pass
+
         self.emailTo.setText(emailAdress) 
         self.emailFrom.setText(reader["wpwatcher"]["from_email"])
         self.smtpServer.setText(reader["wpwatcher"]["smtp_server"])
         self.passwordBox.setText(reader["wpwatcher"]["smtp_pass"])
+        try:
+            self.apiKeyBox.setText(apiKey[59:-2])
+        except:
+            self.apiKeyBox.setText("")
         if reader["wpwatcher"]["send_email_report"] == "Yes":
             self.emailReport.setChecked(True)
         else:
