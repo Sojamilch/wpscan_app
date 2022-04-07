@@ -261,10 +261,14 @@ class window(QtWidgets.QMainWindow, Ui_MainWindow):
         
         try: # incase website is invalid value it will just ignore it
             for website in listOfWebsites:
-                
-                temp = '{"url": '+'"'+ website +'"}'
 
-                cleanWebsiteList.append(temp)
+                if website == "":
+                    continue
+                else:
+
+                    temp = '{"url": '+'"'+ website +'"}'
+
+                    cleanWebsiteList.append(temp)
         except:
             pass
 
