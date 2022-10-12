@@ -19,4 +19,6 @@ dependencies:
 - qtwidgets
 
 
+*Unfortunately, I have ceased development*
+There are a number of outlying issues and bugs that still remain.
 *Vielen Dank*
